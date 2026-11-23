@@ -127,9 +127,16 @@
   .token svg{width:100%;height:100%;display:block;pointer-events:none}
   .token .emoji{font-size:80px;line-height:1;pointer-events:none}
   .traytext{color:var(--muted);font-size:.95rem;max-width:260px}
-  .dragclone{position:fixed;left:0;top:0;width:84px;aspect-ratio:3/2;pointer-events:none;z-index:70;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.35);background:#fff;display:flex;align-items:center;justify-content:center}
-  .dragclone svg{width:100%;height:100%}
-  .dragclone .emoji{font-size:56px}
+  .dragclone{position:fixed;left:0;top:0;width:84px;pointer-events:none;z-index:70;display:flex;flex-direction:column;align-items:center}
+  .dragclone .cf{width:84px;height:56px;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.35);background:#fff;display:flex;align-items:center;justify-content:center}
+  .dragclone .cf svg{width:100%;height:100%}
+  .dragclone .cf .emoji{font-size:56px}
+  .dragclone .tip{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #ff4f8b}
+  .dragclone .dot{width:8px;height:8px;border-radius:50%;background:#ff4f8b;box-shadow:0 0 0 2px #fff;margin-top:-1px}
+  .mfb{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;min-height:44px;margin:-4px 0 8px}
+  .mfb .feedback{margin:0}
+  .mfb .next{margin:0;padding:8px 22px}
+  .mfb .next:not(.show){display:none}
   .mapbox{position:relative;border-radius:14px;overflow:hidden;background:#cfe6f7;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
   .mapbox svg{display:block;width:100%;height:auto;max-height:72vh;touch-action:none}
   path.land{fill:#ece6d6;stroke:#9c947c;stroke-width:.7;vector-effect:non-scaling-stroke;transition:fill .15s}
@@ -258,10 +265,9 @@
       <div class="traytext"><b id="mtext">Flagge 1 von 10</b><br>Ziehe die Flagge auf das richtige Land.</div>
       <button class="sbtn" id="mhintBtn">💡 Tipp</button>
     </div>
+    <div class="mfb"><div class="feedback" id="mfeedback"></div><button class="next" id="mnextBtn">Weiter ➜</button></div>
     <div class="mapbox" id="mapbox"><div class="maploading">Karte wird geladen …</div></div>
     <div class="maptip">Zoomen: zwei Finger, Mausrad oder + / −</div>
-    <div class="feedback" id="mfeedback"></div>
-    <button class="next" id="mnextBtn">Weiter ➜</button>
   </div>
 
   <!-- Spiel: Ausmalen -->
@@ -806,38 +812,48 @@ function tryDrop(id){
 
 // Ziehen (Maus + Touch) bzw. Antippen
 (()=>{
-  const tok=$('mtoken'); let start=null, clone=null, hover=null;
+  // Die Flagge schwebt über dem Finger; abgelegt wird an der Pfeilspitze darunter (gut sichtbar, nicht vom Finger verdeckt).
+  const tok=$('mtoken'); let start=null, clone=null, hover=null, lastLand=null, off=0, pid=null;
   const landAt=(x,y)=>{ const el=document.elementFromPoint(x,y); return el && el.closest ? el.closest('path.land') : null; };
   const setHover=p=>{ if(hover===p) return; if(hover) hover.classList.remove('hover'); hover=p; if(hover && !hover.classList.contains('done')) hover.classList.add('hover'); };
-  tok.addEventListener('pointerdown',e=>{
-    if(mlocked || !M.svg) return;
-    e.preventDefault(); start={x:e.clientX,y:e.clientY};
-    try{ tok.setPointerCapture(e.pointerId); }catch{}
-  });
-  tok.addEventListener('pointermove',e=>{
-    if(!start) return;
+  const hit=e=>({x:e.clientX, y:e.clientY-off});
+  function move(e){
+    if(!start || e.pointerId!==pid) return;
+    e.preventDefault();
     if(!clone && Math.hypot(e.clientX-start.x,e.clientY-start.y)>6){
-      clone=document.createElement('div'); clone.className='dragclone'; clone.innerHTML=tok.innerHTML; document.body.appendChild(clone);
-      tok.style.opacity=.35;
+      clone=document.createElement('div'); clone.className='dragclone';
+      clone.innerHTML=`<div class="cf">${tok.innerHTML}</div><div class="tip"></div><div class="dot"></div>`;
+      document.body.appendChild(clone); tok.style.opacity=.35;
     }
     if(clone){
-      clone.style.transform=`translate(${e.clientX-42}px,${e.clientY-70}px) rotate(-4deg)`;
-      setHover(landAt(e.clientX,e.clientY));
+      const h=hit(e);
+      clone.style.transform=`translate(${h.x-42}px,${h.y-72}px)`;  // Punkt (dot) liegt genau auf h
+      const p=landAt(h.x,h.y); setHover(p); if(p) lastLand=p; else if(!document.elementFromPoint(h.x,h.y)?.closest?.('#mapbox')) lastLand=null;
     }
-  });
-  const end=e=>{
-    if(!start) return;
+  }
+  function end(e){
+    if(!start || e.pointerId!==pid) return;
+    removeEventListener('pointermove',move); removeEventListener('pointerup',end); removeEventListener('pointercancel',end);
     if(clone){
+      const h=hit(e);
       clone.remove(); clone=null; tok.style.opacity='';
-      const p=landAt(e.clientX,e.clientY); setHover(null);
-      if(p && e.type==='pointerup') tryDrop(p.dataset.id);
+      const p=landAt(h.x,h.y) || lastLand; setHover(null);
+      if(p) tryDrop(p.dataset.id);
+      else { $('mfeedback').textContent='Lass die Flagge über einem Land los – der rosa Punkt zeigt, wo sie landet.'; $('mfeedback').className='feedback'; }
     } else if(e.type==='pointerup'){
       msel=!msel; tok.classList.toggle('sel',msel);
       if(msel){ $('mfeedback').textContent='Jetzt das richtige Land auf der Karte antippen 👆'; $('mfeedback').className='feedback'; }
     }
-    start=null;
-  };
-  tok.addEventListener('pointerup',end); tok.addEventListener('pointercancel',end);
+    start=null; lastLand=null; pid=null;
+  }
+  tok.addEventListener('pointerdown',e=>{
+    if(mlocked || !M.svg || start) return;
+    e.preventDefault(); start={x:e.clientX,y:e.clientY}; pid=e.pointerId;
+    off = e.pointerType==='mouse' ? 0 : 40;   // bei Touch etwas über dem Finger
+    try{ tok.releasePointerCapture(e.pointerId); }catch{}
+    addEventListener('pointermove',move,{passive:false}); addEventListener('pointerup',end); addEventListener('pointercancel',end);
+  });
+  tok.addEventListener('touchstart',e=>e.preventDefault(),{passive:false}); // iOS: kein Scrollen/Lupe beim Ziehen
 })();
 
 $('mhintBtn').onclick=()=>{
