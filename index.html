@@ -26,12 +26,16 @@
     font-family:'Fredoka',system-ui,sans-serif; color:var(--ink);
     background:radial-gradient(1200px 800px at 50% -10%, var(--bg2), var(--bg1));
     min-height:100%;
-    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     overflow-x:hidden;
   }
   canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
   .wrap{max-width:620px;margin:0 auto;padding:20px 16px 40px}
-  header{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px;gap:10px}
+  header{display:flex;align-items:center;justify-content:space-between;color:#fff;margin:-20px -16px 14px;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:45;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;background:linear-gradient(rgba(15,27,61,.97),rgba(15,27,61,.9));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .hright{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .quit{font:inherit;font-weight:700;font-size:1.1rem;min-height:48px;padding:10px 22px;border-radius:999px;border:0;background:#fff;color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3);white-space:nowrap;-webkit-tap-highlight-color:transparent}
+  .quit:hover{background:#ffe9a8}
+  .quit:active{transform:scale(.97)}
   header h1{font-size:1.6rem;margin:0;font-weight:700;letter-spacing:.5px}
   header h1 span{color:var(--accent)}
   .stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
@@ -150,7 +154,7 @@
   .zoomctl button{width:38px;height:38px;border-radius:10px;border:0;background:#fff;color:var(--ink);font:inherit;font-size:20px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer}
   .maploading{padding:80px 20px;text-align:center;color:var(--muted)}
   .maptip{font-size:.85rem;color:var(--muted);text-align:center;margin-top:8px}
-  @media (max-width:420px){ .flagbox{height:170px} .flag{height:150px} .answers button{font-size:.98rem;padding:14px 8px} header h1{font-size:1.3rem}}
+  @media (max-width:420px){ .pl{display:none} .quit{padding:10px 16px} .flagbox{height:170px} .flag{height:150px} .answers button{font-size:.98rem;padding:14px 8px} header h1{font-size:1.3rem}}
   /* Lernen */
   .mini{width:48px;height:32px;border-radius:4px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:26px;background:#fff}
   .mini svg{width:100%;height:100%;display:block}
@@ -161,6 +165,7 @@
   @keyframes infoIn{from{opacity:0;transform:translateY(6px)}}
   .review .det{color:var(--muted)}
   .review .again{color:#c46a00;font-size:.85rem;font-weight:600;white-space:nowrap}
+  .ver{text-align:center;color:#b3b8cc;font-size:.75rem;margin-top:14px}
   .endbtns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
   #practiceBtn{margin-top:4px}
   .stats .pill{font-weight:600}
@@ -192,8 +197,9 @@
 <div class="wrap">
   <header>
     <h1>🏁 Flaggen<span>spiele</span></h1>
-    <div class="stats">
-      <div class="pill" title="So viele Flaggen hast du schon kennengelernt">📚 <b id="learned">0</b> kennengelernt</div>
+    <div class="hright">
+      <div class="stats"><div class="pill" title="So viele Flaggen hast du schon kennengelernt">📚 <b id="learned">0</b><span class="pl"> kennengelernt</span></div></div>
+      <button class="quit hidden" id="quitBtn" data-home>✕ Beenden</button>
     </div>
   </header>
 
@@ -207,11 +213,11 @@
       <button class="tile" id="tileMap"><span class="ti">🗺️</span><b>Flaggen auf der Karte</b><small>Ziehe die Flagge auf das richtige Land.</small></button>
     </div>
     <div class="best" id="menuLearned"></div>
+    <div class="ver">Version 6</div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
   <div class="card screen hidden" id="start">
-    <button class="back" data-home>← Menü</button>
     <h2>🔍 Flaggen erkennen</h2>
     <p>Wähle aus vier Ländern das passende. Danach erfährst du die Hauptstadt und den Kontinent. Daneben getippt? Kein Problem – du siehst, wie die Flagge des gewählten Landes aussieht, und probierst einfach nochmal.</p>
     <div class="opts">
@@ -240,7 +246,6 @@
 
   <!-- Start: Flaggen ausmalen -->
   <div class="card screen hidden" id="pstart">
-    <button class="back" data-home>← Menü</button>
     <h2>🎨 Flaggen ausmalen</h2>
     <p>Du siehst den Ländernamen und eine leere Flagge. Wähle eine Farbe und tippe auf die Felder, dann auf „Prüfen“. Mit 💡 kannst du dir das Original jederzeit kurz anschauen.</p>
     <div class="opts">
@@ -258,7 +263,6 @@
 
   <!-- Start: Karte -->
   <div class="card screen hidden" id="mstart">
-    <button class="back" data-home>← Menü</button>
     <h2>🗺️ Flaggen auf der Karte</h2>
     <p>Ziehe die Flagge auf das richtige Land – oder tippe erst die Flagge und dann das Land an. Die Karte springt zum passenden Kontinent, die Kontinente haben eigene Farben und die Ländernamen helfen dir (mit „Aa“ ein- und ausschaltbar).</p>
     <div class="opts">
@@ -287,7 +291,6 @@
 
   <!-- Spiel: Karte -->
   <div class="card hidden" id="mapgame">
-    <button class="back" data-home>✕ Beenden</button>
     <div class="progress"><i id="mbar"></i></div>
     <div class="tray">
       <div class="token" id="mtoken"></div>
@@ -302,7 +305,6 @@
 
   <!-- Spiel: Ausmalen -->
   <div class="card hidden" id="paint">
-    <button class="back" data-home>✕ Beenden</button>
     <div class="progress"><i id="pbar"></i></div>
     <div class="question" id="ptext">Male die Flagge aus</div>
     <div class="pname" id="pname"></div>
@@ -320,7 +322,6 @@
 
   <!-- Spiel: Erkennen -->
   <div class="card hidden" id="game">
-    <button class="back" data-home>✕ Beenden</button>
     <div class="progress"><i id="bar"></i></div>
     <div class="flagbox"><div class="flag" id="flag"></div></div>
     <div class="question" id="qtext">Zu welchem Land gehört diese Flagge?</div>
@@ -437,6 +438,8 @@ const SCREENS=['menu','start','pstart','mstart','game','paint','mapgame','end'];
 function show(id){
   SCREENS.forEach(s=>$(s).classList.toggle('hidden', s!==id));
   document.querySelector('.wrap').classList.toggle('wide', id==='mapgame');
+  $('quitBtn').classList.toggle('hidden', id==='menu');
+  $('quitBtn').textContent = ['game','paint','mapgame'].includes(id) ? '✕ Beenden' : '← Menü';
   scrollTo({top:0});
 }
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{ show('menu'); updateLearned(); });
@@ -836,15 +839,19 @@ function drawOverlay(){
   }).join('');
 }
 // Auf den Kontinent der Flagge zoomen und die anderen Kontinente blass machen (Hilfe)
+// Ablauf: erst die ganze Karte zeigen, kurz warten, dann den Kontinent hervorheben und hineinzoomen
 function focusContinent(code){
   const c=CONT[code]; if(!c || !M.svg) return;
-  M.svg.setAttribute('data-focus',c);
+  const sel=d3.select(M.svg);
+  M.svg.removeAttribute('data-focus');
   const box = mregion==='all' ? WORLDBOX[c] : (mregion==='AM' ? BOXES[c] : null);
+  let tr = sel.transition('focus').duration(M.t.k>1.01 ? 700 : 0).call(M.zoom.transform,d3.zoomIdentity)
+              .transition().delay(900).duration(0).on('start',()=>M.svg.setAttribute('data-focus',c));
   if(!box) return;
   const [[x0,y0],[x1,y1]] = M.path.bounds(gridOf(box));
   const k=Math.max(1,Math.min(8, .95/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
   const t=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2);
-  d3.select(M.svg).transition().duration(900).call(M.zoom.transform,t);
+  tr.transition().delay(350).duration(1100).ease(d3.easeCubicInOut).call(M.zoom.transform,t);
 }
 
 async function startMap(override){
@@ -1039,7 +1046,10 @@ updateLearned();
 </script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  // Neue Version gefunden? Dann einmal automatisch neu laden.
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js', {updateViaCache: 'none'}).then(r => r.update()).catch(() => {});
 }
 </script>
 </body>
