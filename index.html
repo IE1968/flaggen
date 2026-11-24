@@ -131,8 +131,8 @@
   .dragclone .cf{width:84px;height:56px;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.35);background:#fff;display:flex;align-items:center;justify-content:center}
   .dragclone .cf svg{width:100%;height:100%}
   .dragclone .cf .emoji{font-size:56px}
-  .dragclone .tip{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:12px solid #ff4f8b;margin-top:-1px}
-  .dragclone .dot{width:10px;height:10px;border-radius:50%;background:#ff4f8b;box-shadow:0 0 0 2px #fff}
+  .dragclone .tip{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #ff4f8b}
+  .dragclone .dot{width:8px;height:8px;border-radius:50%;background:#ff4f8b;box-shadow:0 0 0 2px #fff;margin-top:-1px}
   .mfb{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;min-height:44px;margin:-4px 0 8px}
   .mfb .feedback{margin:0}
   .mfb .next{margin:0;padding:8px 22px}
@@ -812,7 +812,7 @@ function tryDrop(id){
 
 // Ziehen (Maus + Touch) bzw. Antippen
 (()=>{
-  // Oben sitzt ein Punkt mit Pfeil, darunter hängt die Flagge, darunter ist der Finger. Abgelegt wird am Punkt.
+  // Die Flagge schwebt über dem Finger; abgelegt wird an der Pfeilspitze darunter (gut sichtbar, nicht vom Finger verdeckt).
   const tok=$('mtoken'); let start=null, clone=null, hover=null, lastLand=null, off=0, pid=null;
   const landAt=(x,y)=>{ const el=document.elementFromPoint(x,y); return el && el.closest ? el.closest('path.land') : null; };
   const setHover=p=>{ if(hover===p) return; if(hover) hover.classList.remove('hover'); hover=p; if(hover && !hover.classList.contains('done')) hover.classList.add('hover'); };
@@ -822,12 +822,12 @@ function tryDrop(id){
     e.preventDefault();
     if(!clone && Math.hypot(e.clientX-start.x,e.clientY-start.y)>6){
       clone=document.createElement('div'); clone.className='dragclone';
-      clone.innerHTML=`<div class="dot"></div><div class="tip"></div><div class="cf">${tok.innerHTML}</div>`;
+      clone.innerHTML=`<div class="cf">${tok.innerHTML}</div><div class="tip"></div><div class="dot"></div>`;
       document.body.appendChild(clone); tok.style.opacity=.35;
     }
     if(clone){
       const h=hit(e);
-      clone.style.transform=`translate(${h.x-42}px,${h.y-5}px)`;  // Punkt (dot) oben liegt genau auf h, Flagge hängt darunter
+      clone.style.transform=`translate(${h.x-42}px,${h.y-72}px)`;  // Punkt (dot) liegt genau auf h
       const p=landAt(h.x,h.y); setHover(p); if(p) lastLand=p; else if(!document.elementFromPoint(h.x,h.y)?.closest?.('#mapbox')) lastLand=null;
     }
   }
@@ -849,7 +849,7 @@ function tryDrop(id){
   tok.addEventListener('pointerdown',e=>{
     if(mlocked || !M.svg || start) return;
     e.preventDefault(); start={x:e.clientX,y:e.clientY}; pid=e.pointerId;
-    off = e.pointerType==='mouse' ? 0 : 85;   // bei Touch: Punkt oben, Flagge darunter, Finger ganz unten
+    off = e.pointerType==='mouse' ? 0 : 40;   // bei Touch etwas über dem Finger
     try{ tok.releasePointerCapture(e.pointerId); }catch{}
     addEventListener('pointermove',move,{passive:false}); addEventListener('pointerup',end); addEventListener('pointercancel',end);
   });
