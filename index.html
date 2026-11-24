@@ -143,7 +143,7 @@
   .mfb .next{margin:0;padding:8px 22px}
   .mfb .next:not(.show){display:none}
   .mapbox{position:relative;border-radius:14px;overflow:hidden;background:#cfe6f7;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
-  .mapbox svg{display:block;width:100%;height:auto;max-height:72vh;touch-action:none}
+  .mapbox svg{display:block;width:100%;height:auto;max-height:max(300px,calc(100vh - 330px));max-height:max(300px,calc(100dvh - 330px));touch-action:none;margin:0 auto}
   path.land{fill:#ece6d6;stroke:#9c947c;stroke-width:.7;vector-effect:non-scaling-stroke;transition:fill .15s}
   path.land.hover{fill:#ffd866}
   path.land.done{fill:#a8e0bf}
@@ -237,7 +237,7 @@
       </div>
     </div>
     <div class="best" id="menuLearned"></div>
-    <div class="ver">Version 8</div>
+    <div class="ver">Version 10</div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
@@ -469,15 +469,36 @@ $('tileMap').onclick=()=>{ mode='map'; show('mstart'); loadMap().catch(()=>{}); 
 // ---------- Vorlesen (für Kinder, die noch nicht lesen) ----------
 let soundOn = store.get('flaggen-ton') !== false;
 let VOICE=null;
-function pickVoice(){ try{ const v=speechSynthesis.getVoices().filter(v=>/^de/i.test(v.lang)); VOICE=v.find(x=>/Anna|Petra|Helena|Google/i.test(x.name))||v[0]||null; }catch{} }
+// Beste deutsche Stimme wählen: erst hochwertige (Premium/Erweitert/Siri), dann bekannte natürliche Stimmen
+function pickVoice(){
+  try{
+    const v=speechSynthesis.getVoices().filter(v=>/^de/i.test(v.lang));
+    const rank=x=>(/premium|erweitert|enhanced|siri|neural|natural|online/i.test(x.name)?100:0)
+      +(/Anna|Helena|Petra|Marlene|Vicki|Katja|Seraphina|Amala|Google Deutsch/i.test(x.name)?10:0)
+      +(/^de-DE/i.test(x.lang)?5:0)+(x.localService?1:0);
+    VOICE=v.sort((a,b)=>rank(b)-rank(a))[0]||null;
+  }catch{}
+}
 try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch{}
+// Text in Sätze teilen: kurze Ausrufe ("Prima!", "Toll gemacht!") fröhlich und höher,
+// Fragen etwas lebendiger, der Rest ruhig – mit kleinen Schwankungen, damit es nicht monoton klingt.
 function say(text){
   if(!soundOn || !('speechSynthesis' in window)) return;
   try{
     speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text.replace(/[^\p{L}\p{N}\s!?.,:'-]/gu,''));
-    u.lang='de-DE'; u.rate=.9; u.pitch=1.1; if(VOICE) u.voice=VOICE;
-    speechSynthesis.speak(u);
+    const clean=text.replace(/[^\p{L}\p{N}\s!?.,:'-]/gu,'').replace(/\s+/g,' ').trim();
+    const parts=clean.match(/[^.!?]+[.!?]?/g)||[clean];
+    const jitter=a=>a+(Math.random()-.5)*.08;
+    parts.forEach(t=>{
+      t=t.trim(); if(!t) return;
+      const u=new SpeechSynthesisUtterance(t);
+      u.lang='de-DE'; if(VOICE) u.voice=VOICE;
+      const happy=/!$/.test(t) && t.split(' ').length<=4;
+      if(happy){ u.pitch=jitter(1.35); u.rate=jitter(1.02); u.volume=1; }
+      else if(/\?$/.test(t)){ u.pitch=jitter(1.18); u.rate=jitter(.94); }
+      else { u.pitch=jitter(1.08); u.rate=jitter(.92); }
+      speechSynthesis.speak(u);
+    });
   }catch{}
 }
 function updateSoundBtn(){ $('soundBtn').textContent = soundOn ? '🔊' : '🔇'; $('soundBtn').title = soundOn ? 'Vorlesen aus' : 'Vorlesen an'; }
@@ -508,7 +529,7 @@ function infoHTML(code, kind, lead){
   return `<div class="info ${kind||''}"><span class="mini">${flagHTML(code)}</span><div>${lead?lead:`<b>${c.name}</b>`}
     ${level!=='easy'&&c.capital?`<br><span class="det">🏛️ Hauptstadt: ${c.capital}</span> ·`:'<br>'}${cont?`<span class="det"> 🌍 liegt in ${CONTNAME[cont]}</span>`:''}</div></div>`;
 }
-const PRAISE=['Super! 🎉','Richtig! 🥳','Klasse! ✨','Genau! 🎊','Toll! 🌟'];
+const PRAISE=['Prima! 🎉','Toll! 🥳','Perfekt! 🌟','Super gemacht! ✨','Klasse! 🎊','Spitze! 🏆','Wunderbar! 💫','Bravo! 👏','Richtig gut! 🌈','Genau richtig! ⭐'];
 const praise=()=>PRAISE[Math.random()*PRAISE.length|0];
 
 // Abschluss – ohne Punkte, mit Lernrückblick
@@ -517,7 +538,7 @@ function finish(){
   const n=log.length, again=log.filter(l=>l.tries>1);
   $('endTitle').textContent = 'Schön geübt! 🌟';
   $('endMsg').textContent = `Du hast ${n} ${n===1?'Flagge':'Flaggen'} geschafft!` + (again.length ? ' Willst du die schweren nochmal üben?' : ' Toll gemacht!');
-  say('Schön geübt! ' + $('endMsg').textContent);
+  say('Schön geübt! Du bist ein echter Flaggen-Profi! ' + $('endMsg').textContent);
   $('review').innerHTML = log.map(l=>{
     const c=BYCODE[l.q.code]||{};
     return `<div><span class="mini">${mode==='paint'?paintSVG(l.q,null,true):flagHTML(l.q.code)}</span>
@@ -566,10 +587,10 @@ function answer(btn,o,q){
     locked=true; [...$('answers').children].forEach(b=>{ b.disabled=true; if(b!==btn) b.classList.add('faded'); }); $('ghintBtn').disabled=true;
     log.push({q,tries}); markLearned(q.code);
     btn.classList.add('correct','named');
-    const p=tries===1 ? praise() : 'Jetzt hast du es! 🎉';
+    const p=tries===1 ? praise() : ['Jetzt hast du es! 🎉','Prima, gefunden! 🎉','Toll, geschafft! 🎉'][Math.random()*3|0];
     $('feedback').textContent=p; $('feedback').className='feedback ok';
     $('ginfo').innerHTML = infoHTML(q.code,'ok');
-    say(`${p.replace(/[^\p{L}\s!.,]/gu,'')} Das ist die Flagge von ${von(q.code)}.`);
+    say(`${p} Das ist die Flagge von ${von(q.code)}.`);
     fireworks(3);
     $('nextBtn').textContent = idx+1<deck.length ? 'Weiter ➜' : 'Fertig 🏁';
     $('nextBtn').classList.add('show');
@@ -752,7 +773,7 @@ $('checkBtn').onclick=()=>{
   if(!wrong){
     plocked=true;
     log.push({q:f,tries:ptries}); markLearned(f.code);
-    $('pfeedback').textContent = ptries===1 ? ['Wunderschön! 🎨','Perfekt gemalt! 🥳','Ein Kunstwerk! 🌟'][Math.random()*3|0] : 'Jetzt stimmt alles! 🎉';
+    $('pfeedback').textContent = ptries===1 ? ['Wunderschön! 🎨','Perfekt gemalt! 🥳','Ein Kunstwerk! 🌟','Prima gemalt! 🖍️','Toll! 🌈'][Math.random()*5|0] : ['Jetzt stimmt alles! 🎉','Prima, geschafft! 🎉'][Math.random()*2|0];
     say($('pfeedback').textContent+` Das ist die Flagge von ${von(f.code)}.`);
     $('pfeedback').className='feedback ok';
     $('pinfo').innerHTML=infoHTML(f.code,'ok');
@@ -867,7 +888,7 @@ function buildMap(){
     <div class="zoomctl"><button id="zin" aria-label="Vergrößern">+</button><button id="zout" aria-label="Verkleinern">−</button>
       <button id="zreset" aria-label="Ganze Karte" title="Ganze Karte">🌍</button><button id="znames" class="${showNames?'on':''}" title="Ländernamen ein/aus" aria-label="Ländernamen ein/aus">Aa</button></div>`;
   M.svg=$('mapbox').querySelector('svg'); M.root=d3.select('#mroot');
-  M.zoom=d3.zoom().scaleExtent([1,16]).translateExtent([[0,0],[W,H]])
+  M.zoom=d3.zoom().scaleExtent([1,16]).translateExtent([[-W*.6,-H*.6],[W*1.6,H*1.6]])
     .on('zoom',e=>{ M.t=e.transform; M.root.attr('transform',e.transform); drawOverlay(); });
   d3.select(M.svg).call(M.zoom).on('dblclick.zoom',null);
   $('zin').onclick=()=>d3.select(M.svg).transition().duration(300).call(M.zoom.scaleBy,1.7);
@@ -916,10 +937,12 @@ function focusContinent(code){
   const box = mregion==='all' ? WORLDBOX[c] : (mregion==='AM' ? BOXES[c] : null);
   let tr = sel.transition('focus').duration(M.t.k>1.01 ? 700 : 0).call(M.zoom.transform,d3.zoomIdentity)
               .transition().delay(900).duration(0).on('start',()=>M.svg.setAttribute('data-focus',c));
-  if(!box) return;
-  const [[x0,y0],[x1,y1]] = M.path.bounds(gridOf(box));
-  const k=Math.max(1,Math.min(8, .95/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
-  const t=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2);
+  // Zoomstufe passend zum Kontinent, aber das gesuchte Land liegt immer in der Mitte
+  let k=1.4;
+  if(box){ const [[x0,y0],[x1,y1]] = M.path.bounds(gridOf(box)); k=Math.max(1.2,Math.min(8, .8/Math.max((x1-x0)/M.W,(y1-y0)/M.H))); }
+  const f=M.byId[code]; if(!f) return;
+  const [cx,cy]=M.path.centroid(largestPart(f));
+  const t=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-cx,-cy);
   tr.transition().delay(350).duration(1100).ease(d3.easeCubicInOut).call(M.zoom.transform,t);
 }
 
@@ -961,7 +984,7 @@ function tryDrop(id){
     el.classList.add('done');
     const c=M.path.centroid(largestPart(M.byId[id])); M.pins.push({code:id,x:c[0],y:c[1]}); drawOverlay();
     $('mtoken').classList.add('gone');
-    $('mfeedback').textContent = mtries===1 ? praise() : 'Jetzt hast du es! 🎉';
+    $('mfeedback').textContent = mtries===1 ? praise() : ['Jetzt hast du es! 🎉','Prima, gefunden! 🎉','Toll, geschafft! 🎉'][Math.random()*3|0];
     say($('mfeedback').textContent+` Hier liegt ${q.name}.`);
     $('mfeedback').className='feedback ok';
     $('minfo').innerHTML=infoHTML(q.code,'ok');
