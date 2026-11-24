@@ -58,6 +58,7 @@
   .answers button.correct{background:#e3f8ee;border-color:var(--ok);color:#0e6b41}
   .answers button.wrong{background:#fdecec;border-color:var(--bad);color:#9b1c20;animation:shake .4s}
   .answers button:disabled{cursor:default}
+  .answers button.faded{opacity:.3}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
   .feedback{min-height:28px;text-align:center;margin-top:16px;font-weight:600;font-size:1.1rem}
   .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
@@ -165,6 +166,20 @@
   @keyframes infoIn{from{opacity:0;transform:translateY(6px)}}
   .review .det{color:var(--muted)}
   .review .again{color:#c46a00;font-size:.85rem;font-weight:600;white-space:nowrap}
+  .say{font-size:1.4rem;border:0;background:#eef2ff;border-radius:50%;width:48px;height:48px;cursor:pointer;vertical-align:middle;margin-left:4px}
+  .sound{font-size:1.4rem;border:0;background:rgba(255,255,255,.15);border-radius:50%;width:48px;height:48px;cursor:pointer}
+  .kid{font-size:1.25rem;color:var(--ink) !important;line-height:1.5}
+  .levelbox{margin-top:22px;border-top:1px solid #eef0f8;padding-top:14px}
+  .ask{text-align:center;font-size:1.3rem;margin:0 0 18px;line-height:1.6}
+  .ask b{font-size:1.9rem;display:inline-block}
+  .answers.flags{grid-template-columns:repeat(3,1fr);gap:14px}
+  .answers.flags button{padding:10px;min-height:0;display:flex;flex-direction:column;align-items:center;gap:6px;border-width:4px}
+  .answers.flags .fl{width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;background:#fff}
+  .answers.flags .fl svg{width:100%;height:100%;display:block}
+  .answers.flags .fl .emoji{font-size:64px}
+  .answers.flags .nm{font-size:.95rem;visibility:hidden}
+  .answers.flags button.named .nm{visibility:visible}
+  @media (max-width:520px){ .answers.flags{gap:8px} .answers.flags button{padding:6px} .answers.flags .nm{font-size:.8rem} .ask b{font-size:1.5rem} }
   .ver{text-align:center;color:#b3b8cc;font-size:.75rem;margin-top:14px}
   .endbtns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
   #practiceBtn{margin-top:4px}
@@ -199,75 +214,73 @@
     <h1>🏁 Flaggen<span>spiele</span></h1>
     <div class="hright">
       <div class="stats"><div class="pill" title="So viele Flaggen hast du schon kennengelernt">📚 <b id="learned">0</b><span class="pl"> kennengelernt</span></div></div>
+      <button class="sound" id="soundBtn" aria-label="Vorlesen an/aus">🔊</button>
       <button class="quit hidden" id="quitBtn" data-home>✕ Beenden</button>
     </div>
   </header>
 
   <!-- Menü -->
   <div class="card screen" id="menu">
-    <h2>Lass uns Flaggen entdecken!</h2>
-    <p>Such dir aus, wie du heute üben möchtest. Es gibt keine Punkte – nimm dir Zeit, probier aus und lerne nebenbei Länder und Hauptstädte kennen.</p>
+    <h2>Lass uns Flaggen entdecken! <button class="say" data-say="Lass uns Flaggen entdecken! Such dir ein Spiel aus.">🔊</button></h2>
     <div class="tiles">
-      <button class="tile" id="tileGuess"><span class="ti">🔍</span><b>Flaggen erkennen</b><small>Welche Flagge gehört zu welchem Land?</small></button>
-      <button class="tile" id="tilePaint"><span class="ti">🎨</span><b>Flaggen ausmalen</b><small>Male die Flagge in den richtigen Farben aus.</small></button>
-      <button class="tile" id="tileMap"><span class="ti">🗺️</span><b>Flaggen auf der Karte</b><small>Ziehe die Flagge auf das richtige Land.</small></button>
+      <button class="tile" id="tileGuess"><span class="ti">🔍</span><b>Flagge finden</b><small>Welche Flagge ist es?</small></button>
+      <button class="tile" id="tilePaint"><span class="ti">🎨</span><b>Flagge malen</b><small>Male die Flagge bunt an.</small></button>
+      <button class="tile" id="tileMap"><span class="ti">🗺️</span><b>Flagge auf die Karte</b><small>Wo liegt das Land?</small></button>
+    </div>
+    <div class="opts levelbox">
+      <div>
+        <label>Für Eltern: Welche Länder?</label>
+        <div class="seg" id="levelSeg">
+          <button data-v="easy">⭐ Bekannte Länder (ab 5 Jahren)</button>
+          <button data-v="all">🌍 Alle Länder</button>
+        </div>
+      </div>
     </div>
     <div class="best" id="menuLearned"></div>
-    <div class="ver">Version 6</div>
+    <div class="ver">Version 8</div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
   <div class="card screen hidden" id="start">
-    <h2>🔍 Flaggen erkennen</h2>
-    <p>Wähle aus vier Ländern das passende. Danach erfährst du die Hauptstadt und den Kontinent. Daneben getippt? Kein Problem – du siehst, wie die Flagge des gewählten Landes aussieht, und probierst einfach nochmal.</p>
+    <h2>🔍 Flagge finden</h2>
+    <p class="kid">Du hörst ein Land.<br>Tippe auf die richtige Flagge! 👆</p>
     <div class="opts">
-      <div>
-        <label>Region</label>
-        <div class="seg" id="regionSeg">
-          <button data-v="all" class="on">🌍 Ganze Welt</button>
-          <button data-v="EU">Europa</button>
-          <button data-v="AS">Asien</button>
-          <button data-v="AF">Afrika</button>
-          <button data-v="AM">Amerika</button>
-          <button data-v="OC">Ozeanien</button>
-        </div>
-      </div>
       <div>
         <label>Wie viele Flaggen?</label>
         <div class="seg" id="countSeg">
-          <button data-v="10" class="on">10</button>
-          <button data-v="20">20</button>
+          <button data-v="5" class="on">5</button>
+          <button data-v="10">10</button>
           <button data-v="0">Alle</button>
         </div>
       </div>
     </div>
-    <button class="big" id="startBtn">Los geht's!</button>
+    <button class="big" id="startBtn">Los geht's! ▶</button>
   </div>
 
   <!-- Start: Flaggen ausmalen -->
   <div class="card screen hidden" id="pstart">
-    <h2>🎨 Flaggen ausmalen</h2>
-    <p>Du siehst den Ländernamen und eine leere Flagge. Wähle eine Farbe und tippe auf die Felder, dann auf „Prüfen“. Mit 💡 kannst du dir das Original jederzeit kurz anschauen.</p>
+    <h2>🎨 Flagge malen</h2>
+    <p class="kid">Tippe auf eine Farbe 🖍️<br>und dann auf die Flagge.<br>Fertig? Tippe auf ✔!</p>
     <div class="opts">
       <div>
         <label>Wie viele Flaggen?</label>
         <div class="seg" id="pcountSeg">
-          <button data-v="10" class="on">10</button>
-          <button data-v="20">20</button>
+          <button data-v="5" class="on">5</button>
+          <button data-v="10">10</button>
           <button data-v="0">Alle</button>
         </div>
       </div>
     </div>
-    <button class="big" id="pstartBtn">Los geht's!</button>
+    <button class="big" id="pstartBtn">Los geht's! ▶</button>
   </div>
 
   <!-- Start: Karte -->
   <div class="card screen hidden" id="mstart">
     <h2>🗺️ Flaggen auf der Karte</h2>
-    <p>Ziehe die Flagge auf das richtige Land – oder tippe erst die Flagge und dann das Land an. Die Karte springt zum passenden Kontinent, die Kontinente haben eigene Farben und die Ländernamen helfen dir (mit „Aa“ ein- und ausschaltbar).</p>
+    <p class="kid">Zieh die Flagge mit dem Finger<br>auf das richtige Land! 👆🗺️</p>
     <div class="opts">
       <div>
-        <label>Karte</label>
+        <label>Für Eltern: Welcher Teil der Welt?</label>
         <div class="seg" id="mregionSeg">
           <button data-v="all" class="on">🌍 Ganze Welt</button>
           <button data-v="EU">Europa</button>
@@ -280,13 +293,13 @@
       <div>
         <label>Wie viele Flaggen?</label>
         <div class="seg" id="mcountSeg">
-          <button data-v="10" class="on">10</button>
-          <button data-v="20">20</button>
+          <button data-v="5" class="on">5</button>
+          <button data-v="10">10</button>
           <button data-v="0">Alle</button>
         </div>
       </div>
     </div>
-    <button class="big" id="mstartBtn">Los geht's!</button>
+    <button class="big" id="mstartBtn">Los geht's! ▶</button>
   </div>
 
   <!-- Spiel: Karte -->
@@ -294,7 +307,7 @@
     <div class="progress"><i id="mbar"></i></div>
     <div class="tray">
       <div class="token" id="mtoken"></div>
-      <div class="traytext"><b id="mtext">Flagge 1 von 10</b><br>Ziehe die Flagge auf das richtige Land.</div>
+      <div class="traytext"><b id="mtext">Flagge 1 von 5</b><br>Wo liegt <b id="mname"></b>? <button class="say" id="msay" aria-label="Vorlesen">🔊</button></div>
       <button class="sbtn" id="mhintBtn">💡 Tipp</button>
     </div>
     <div class="mfb"><div class="feedback" id="mfeedback"></div><button class="next" id="mnextBtn">Weiter ➜</button></div>
@@ -323,9 +336,10 @@
   <!-- Spiel: Erkennen -->
   <div class="card hidden" id="game">
     <div class="progress"><i id="bar"></i></div>
-    <div class="flagbox"><div class="flag" id="flag"></div></div>
-    <div class="question" id="qtext">Zu welchem Land gehört diese Flagge?</div>
-    <div class="answers" id="answers"></div>
+    <div class="question" id="qtext">Flagge 1 von 5</div>
+    <div class="ask"><span>Wo ist die Flagge von</span> <b id="qname"></b> <button class="say" id="qsay" aria-label="Vorlesen">🔊</button></div>
+    <div class="answers flags" id="answers"></div>
+    <div class="pbtns" style="margin-top:14px"><button class="sbtn" id="ghintBtn">💡 Tipp</button></div>
     <div class="feedback" id="feedback"></div>
     <div id="ginfo"></div>
     <button class="next" id="nextBtn">Weiter ➜</button>
@@ -347,7 +361,7 @@ const COUNTRIES = [
  // Europa
  ["DE","Deutschland","EU","Berlin"],["AT","Österreich","EU","Wien"],["CH","Schweiz","EU","Bern"],["FR","Frankreich","EU","Paris"],
  ["IT","Italien","EU","Rom"],["ES","Spanien","EU","Madrid"],["PT","Portugal","EU","Lissabon"],["NL","Niederlande","EU","Amsterdam"],
- ["BE","Belgien","EU","Brüssel"],["LU","Luxemburg","EU","Luxemburg"],["GB","Vereinigtes Königreich","EU","London"],["IE","Irland","EU","Dublin"],
+ ["BE","Belgien","EU","Brüssel"],["LU","Luxemburg","EU","Luxemburg"],["GB","Großbritannien","EU","London"],["IE","Irland","EU","Dublin"],
  ["DK","Dänemark","EU","Kopenhagen"],["NO","Norwegen","EU","Oslo"],["SE","Schweden","EU","Stockholm"],["FI","Finnland","EU","Helsinki"],
  ["IS","Island","EU","Reykjavík"],["PL","Polen","EU","Warschau"],["CZ","Tschechien","EU","Prag"],["SK","Slowakei","EU","Bratislava"],
  ["HU","Ungarn","EU","Budapest"],["RO","Rumänien","EU","Bukarest"],["BG","Bulgarien","EU","Sofia"],["GR","Griechenland","EU","Athen"],
@@ -377,7 +391,7 @@ const COUNTRIES = [
  ["CD","Demokratische Republik Kongo","AF","Kinshasa"],["SO","Somalia","AF","Mogadischu"],["MU","Mauritius","AF","Port Louis"],["SC","Seychellen","AF","Victoria"],
  ["GA","Gabun","AF","Libreville"],["SL","Sierra Leone","AF","Freetown"],["GN","Guinea","AF","Conakry"],["BJ","Benin","AF","Porto-Novo"],
  // Amerika
- ["US","Vereinigte Staaten","AM","Washington, D.C."],["CA","Kanada","AM","Ottawa"],["MX","Mexiko","AM","Mexiko-Stadt"],["BR","Brasilien","AM","Brasília"],
+ ["US","USA","AM","Washington, D.C."],["CA","Kanada","AM","Ottawa"],["MX","Mexiko","AM","Mexiko-Stadt"],["BR","Brasilien","AM","Brasília"],
  ["AR","Argentinien","AM","Buenos Aires"],["CL","Chile","AM","Santiago de Chile"],["CO","Kolumbien","AM","Bogotá"],["PE","Peru","AM","Lima"],
  ["VE","Venezuela","AM","Caracas"],["EC","Ecuador","AM","Quito"],["BO","Bolivien","AM","Sucre"],["PY","Paraguay","AM","Asunción"],
  ["UY","Uruguay","AM","Montevideo"],["CU","Kuba","AM","Havanna"],["JM","Jamaika","AM","Kingston"],["PA","Panama","AM","Panama-Stadt"],
@@ -390,6 +404,11 @@ const COUNTRIES = [
  ["PW","Palau","OC","Ngerulmud"],["KI","Kiribati","OC","South Tarawa"]
 ].map(([code,name,region,capital])=>({code,name,region,capital}));
 const BYCODE = Object.fromEntries(COUNTRIES.map(c=>[c.code,c]));
+// "die Flagge von …" – Länder mit Artikel richtig vorlesen/anzeigen
+const VON = {NL:'den Niederlanden',US:'den USA',CH:'der Schweiz',PH:'den Philippinen',AE:'den Vereinigten Arabischen Emiraten',
+  DO:'der Dominikanischen Republik',CD:'der Demokratischen Republik Kongo',VA:'der Vatikanstadt',BS:'den Bahamas',SB:'den Salomonen',
+  SC:'den Seychellen',CI:'der Elfenbeinküste',MN:'der Mongolei',SK:'der Slowakei',TR:'der Türkiye'};
+const von = code => VON[code] || (BYCODE[code]||{}).name || code;
 
 // Kontinent jedes Kartenlandes (für Farben auf der Karte; Amerika geteilt in Nord und Süd)
 const CONT = {};
@@ -447,6 +466,32 @@ $('tileGuess').onclick=()=>{ mode='guess'; show('start'); };
 $('tilePaint').onclick=()=>{ mode='paint'; show('pstart'); };
 $('tileMap').onclick=()=>{ mode='map'; show('mstart'); loadMap().catch(()=>{}); };
 
+// ---------- Vorlesen (für Kinder, die noch nicht lesen) ----------
+let soundOn = store.get('flaggen-ton') !== false;
+let VOICE=null;
+function pickVoice(){ try{ const v=speechSynthesis.getVoices().filter(v=>/^de/i.test(v.lang)); VOICE=v.find(x=>/Anna|Petra|Helena|Google/i.test(x.name))||v[0]||null; }catch{} }
+try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch{}
+function say(text){
+  if(!soundOn || !('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/[^\p{L}\p{N}\s!?.,:'-]/gu,''));
+    u.lang='de-DE'; u.rate=.9; u.pitch=1.1; if(VOICE) u.voice=VOICE;
+    speechSynthesis.speak(u);
+  }catch{}
+}
+function updateSoundBtn(){ $('soundBtn').textContent = soundOn ? '🔊' : '🔇'; $('soundBtn').title = soundOn ? 'Vorlesen aus' : 'Vorlesen an'; }
+$('soundBtn').onclick=()=>{ soundOn=!soundOn; store.set('flaggen-ton',soundOn); updateSoundBtn(); if(soundOn) say('Ich lese dir vor.'); else try{speechSynthesis.cancel();}catch{} };
+updateSoundBtn();
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-say]'); if(b) say(b.dataset.say); });
+
+// ---------- Welche Länder? Bekannte (für Kinder) oder alle ----------
+const EASY = new Set('DE AT CH FR IT ES PT NL BE DK SE NO FI PL CZ GB IE GR TR RU UA US CA MX BR AR JP CN IN KR AU NZ EG ZA'.split(' '));
+let level = store.get('flaggen-level') || 'easy';
+const basePool = () => level==='easy' ? COUNTRIES.filter(c=>EASY.has(c.code)) : COUNTRIES;
+segment('levelSeg', v=>{ level=v; store.set('flaggen-level',v); });
+[...$('levelSeg').children].forEach(b=>b.classList.toggle('on', b.dataset.v===level));
+
 // Lern-Sammlung: welche Flaggen kennst du schon? (nur für dich, ohne Wertung)
 let learned = new Set(store.get('flaggen-gelernt') || []);
 function markLearned(code){ if(!learned.has(code)){ learned.add(code); store.set('flaggen-gelernt',[...learned]); updateLearned(); } }
@@ -461,7 +506,7 @@ function infoHTML(code, kind, lead){
   const c=BYCODE[code]||{name:code};
   const cont=contOf(code);
   return `<div class="info ${kind||''}"><span class="mini">${flagHTML(code)}</span><div>${lead?lead:`<b>${c.name}</b>`}
-    ${c.capital?`<br><span class="det">🏛️ Hauptstadt: ${c.capital}</span>`:''}${cont?`<span class="det"> · 🌍 ${CONTNAME[cont]}</span>`:''}</div></div>`;
+    ${level!=='easy'&&c.capital?`<br><span class="det">🏛️ Hauptstadt: ${c.capital}</span> ·`:'<br>'}${cont?`<span class="det"> 🌍 liegt in ${CONTNAME[cont]}</span>`:''}</div></div>`;
 }
 const PRAISE=['Super! 🎉','Richtig! 🥳','Klasse! ✨','Genau! 🎊','Toll! 🌟'];
 const praise=()=>PRAISE[Math.random()*PRAISE.length|0];
@@ -471,71 +516,87 @@ function finish(){
   show('end');
   const n=log.length, again=log.filter(l=>l.tries>1);
   $('endTitle').textContent = 'Schön geübt! 🌟';
-  $('endMsg').textContent = `Du hast ${n} ${n===1?'Flagge':'Flaggen'} angeschaut.` +
-    (again.length ? ` ${again.length===1?'Eine war':again.length+' waren'} etwas kniffliger – die kannst du gleich noch einmal üben.` : ' Alle hast du gleich beim ersten Mal gefunden!');
+  $('endMsg').textContent = `Du hast ${n} ${n===1?'Flagge':'Flaggen'} geschafft!` + (again.length ? ' Willst du die schweren nochmal üben?' : ' Toll gemacht!');
+  say('Schön geübt! ' + $('endMsg').textContent);
   $('review').innerHTML = log.map(l=>{
     const c=BYCODE[l.q.code]||{};
     return `<div><span class="mini">${mode==='paint'?paintSVG(l.q,null,true):flagHTML(l.q.code)}</span>
-      <span><b>${l.q.name}</b>${c.capital?` <span class="det">· ${c.capital}</span>`:''}${l.tries>1?' <span class="again">🔁 nochmal üben</span>':''}</span></div>`;
+      <span><b>${l.q.name}</b>${level!=='easy'&&c.capital?` <span class="det">· ${c.capital}</span>`:''}${l.tries>1?' <span class="again">🔁 nochmal üben</span>':''}</span></div>`;
   }).join('');
   $('practiceBtn').classList.toggle('hidden', !again.length);
-  $('practiceBtn').textContent = `🔁 Die kniffligen nochmal üben (${again.length})`;
+  $('practiceBtn').textContent = `🔁 Nochmal üben (${again.length})`;
   $('practiceBtn').onclick = ()=>{ const d=again.map(l=>l.q); ({guess:startGame,paint:startPaint,map:startMap})[mode](d); };
   fireworks(4);
 }
 $('againBtn').onclick=()=>show({paint:'pstart',map:'mstart'}[mode]||'start');
 
-// ================= Flaggen erkennen =================
-let region='all', count=10, locked=false, tries=0, firstPick=null;
-segment('regionSeg', v=>{ region=v; });
+// ================= Flagge finden =================
+// Name wird vorgelesen, man tippt auf eine von drei Flaggen.
+let count=5, locked=false, tries=0;
 segment('countSeg', v=>{ count=+v; });
-const pool = () => region==='all' ? COUNTRIES : COUNTRIES.filter(c=>c.region===region);
 
 function startGame(override){
-  const p=shuffle(pool());
+  const p=shuffle(basePool());
   deck = Array.isArray(override) ? shuffle(override) : (count ? p.slice(0,Math.min(count,p.length)) : p);
   idx=0; log=[]; show('game'); ask();
 }
 function ask(){
-  locked=false; tries=0; firstPick=null;
-  const q=deck[idx], p=COUNTRIES;
-  const same=p.filter(c=>c.code!==q.code && c.region===q.region);
-  const others=shuffle(same.length>=3?same:p.filter(c=>c.code!==q.code)).slice(0,3);
+  locked=false; tries=0;
+  const q=deck[idx], p=basePool();
+  const others=shuffle(p.filter(c=>c.code!==q.code)).slice(0,2);
   const opts=shuffle([q,...others]);
-  $('flag').innerHTML=flagHTML(q.code);
-  $('qtext').textContent=`Flagge ${idx+1} von ${deck.length} – zu welchem Land gehört sie?`;
+  $('qtext').textContent=`Flagge ${idx+1} von ${deck.length}`;
+  $('qname').textContent=von(q.code);
   $('bar').style.width=(idx/deck.length*100)+'%';
   $('feedback').textContent=''; $('feedback').className='feedback'; $('ginfo').innerHTML='';
-  $('nextBtn').classList.remove('show');
+  $('nextBtn').classList.remove('show'); $('ghintBtn').disabled=false;
   const box=$('answers'); box.innerHTML='';
-  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=o.name; b.dataset.code=o.code; b.onclick=()=>answer(b,o,q); box.appendChild(b); });
+  opts.forEach(o=>{
+    const b=document.createElement('button'); b.dataset.code=o.code; b.setAttribute('aria-label','Flagge');
+    b.innerHTML=`<span class="fl">${flagHTML(o.code)}</span><span class="nm">${o.name}</span>`;
+    b.onclick=()=>answer(b,o,q); box.appendChild(b);
+  });
+  say(`Wo ist die Flagge von ${von(q.code)}?`);
 }
+$('qsay').onclick=()=>{ const q=deck[idx]; if(q) say(`Wo ist die Flagge von ${von(q.code)}?`); };
 function answer(btn,o,q){
   if(locked) return;
   tries++;
   if(o.code===q.code){
-    locked=true; [...$('answers').children].forEach(b=>b.disabled=true);
+    locked=true; [...$('answers').children].forEach(b=>{ b.disabled=true; if(b!==btn) b.classList.add('faded'); }); $('ghintBtn').disabled=true;
     log.push({q,tries}); markLearned(q.code);
-    btn.classList.add('correct');
-    $('feedback').textContent = tries===1 ? praise() : 'Jetzt hast du es! 🎉';
-    $('feedback').className='feedback ok';
+    btn.classList.add('correct','named');
+    const p=tries===1 ? praise() : 'Jetzt hast du es! 🎉';
+    $('feedback').textContent=p; $('feedback').className='feedback ok';
     $('ginfo').innerHTML = infoHTML(q.code,'ok');
+    say(`${p.replace(/[^\p{L}\s!.,]/gu,'')} Das ist die Flagge von ${von(q.code)}.`);
     fireworks(3);
     $('nextBtn').textContent = idx+1<deck.length ? 'Weiter ➜' : 'Fertig 🏁';
     $('nextBtn').classList.add('show');
   } else {
-    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong'); btn.disabled=true;
-    $('feedback').textContent='Das ist es leider nicht – probier es nochmal!';
+    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong','named'); btn.disabled=true;
+    $('feedback').textContent=`Das ist ${o.name}. Versuch es nochmal!`;
     $('feedback').className='feedback bad';
-    $('ginfo').innerHTML = infoHTML(o.code,'miss',`So sieht die Flagge von <b>${o.name}</b> aus:`);
+    say(`Das ist die Flagge von ${von(o.code)}. Versuch es nochmal!`);
     sad();
   }
 }
+// Tipp: eine falsche Flagge ausblenden und den Kontinent nennen
+$('ghintBtn').onclick=()=>{
+  if(locked) return;
+  const q=deck[idx];
+  const wrong=shuffle([...$('answers').children].filter(b=>b.dataset.code!==q.code && !b.disabled)).slice(0,1);
+  wrong.forEach(b=>{ b.disabled=true; b.classList.add('faded'); });
+  $('ghintBtn').disabled=true;
+  const t=`${q.name} liegt in ${CONTNAME[contOf(q.code)]||RN[q.region]}.`;
+  $('feedback').textContent='💡 '+t; $('feedback').className='feedback';
+  say(t);
+};
 $('nextBtn').onclick=()=>{ idx++; if(idx<deck.length) ask(); else { $('bar').style.width='100%'; finish(); } };
 $('startBtn').onclick=()=>startGame();
 document.addEventListener('keydown',e=>{
   if($('game').classList.contains('hidden')) return;
-  if(!locked && ['1','2','3','4'].includes(e.key)){ $('answers').children[+e.key-1]?.click(); }
+  if(!locked && ['1','2','3'].includes(e.key)){ $('answers').children[+e.key-1]?.click(); }
   else if(locked && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); $('nextBtn').click(); }
 });
 
@@ -632,7 +693,7 @@ function paintSVG(f, colors, solved){
   return `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${defs}${body}</svg>`;
 }
 
-let pcount=10, pcolors=[], pick='R', ptries=0, plocked=false;
+let pcount=5, pcolors=[], pick='R', ptries=0, plocked=false;
 segment('pcountSeg', v=>{ pcount=+v; });
 
 // Palette aufbauen
@@ -644,7 +705,7 @@ $('palette').addEventListener('click',e=>{
 });
 
 function startPaint(override){
-  const p=shuffle(PAINT);
+  const p=shuffle(level==='easy' ? PAINT.filter(f=>EASY.has(f.code)) : PAINT);
   deck = Array.isArray(override) ? shuffle(override) : (pcount ? p.slice(0,Math.min(pcount,p.length)) : p);
   idx=0; log=[]; show('paint'); paintAsk();
 }
@@ -652,7 +713,7 @@ function paintAsk(){
   const f=deck[idx];
   pcolors=f.r.map(()=>null); ptries=0; plocked=false;
   $('ptext').textContent=`Flagge ${idx+1} von ${deck.length} – male diese Flagge aus:`;
-  $('pname').textContent=f.name;
+  $('pname').innerHTML=`${f.name} <button class="say" data-say="Male die Flagge von ${von(f.code)}.">🔊</button>`;
   $('pbar').style.width=(idx/deck.length*100)+'%';
   $('pflag').classList.toggle('square',!!f.vb); $('phint').classList.toggle('square',!!f.vb);
   $('phint').innerHTML=paintSVG(f,null,true); $('phint').classList.remove('show');
@@ -660,6 +721,7 @@ function paintAsk(){
   $('pnextBtn').classList.remove('show');
   ['hintBtn','resetBtn','checkBtn'].forEach(id=>$(id).disabled=false);
   drawPaint();
+  say(`Male die Flagge von ${von(f.code)}.`);
 }
 function drawPaint(){ $('pflag').innerHTML=paintSVG(deck[idx],pcolors,false); }
 $('pflag').addEventListener('click',e=>{
@@ -670,23 +732,28 @@ $('pflag').addEventListener('click',e=>{
 });
 $('resetBtn').onclick=()=>{ if(plocked) return; pcolors=pcolors.map(()=>null); drawPaint(); };
 let hintTimer;
+function showOriginal(){
+  $('phint').classList.add('show'); clearTimeout(hintTimer);
+  hintTimer=setTimeout(()=>$('phint').classList.remove('show'),2500);
+}
 $('hintBtn').onclick=()=>{
   if(plocked) return;
-  $('phint').classList.add('show'); clearTimeout(hintTimer);
-  hintTimer=setTimeout(()=>$('phint').classList.remove('show'),2000);
-  $('pfeedback').textContent='💡 Schau genau hin – welche Farben siehst du wo?'; $('pfeedback').className='feedback';
+  showOriginal();
+  $('pfeedback').textContent='💡 Schau genau hin!'; $('pfeedback').className='feedback';
+  say('Schau genau hin! Welche Farben siehst du?');
 };
 $('checkBtn').onclick=()=>{
   if(plocked) return;
   const f=deck[idx];
   const empty=pcolors.filter(c=>!c).length;
-  if(empty){ $('pfeedback').textContent=`Noch ${empty} ${empty===1?'Feld':'Felder'} ohne Farbe ✏️`; $('pfeedback').className='feedback'; return; }
+  if(empty){ $('pfeedback').textContent=`Noch ${empty===1?'ein Feld':empty+' Felder'} ohne Farbe ✏️`; $('pfeedback').className='feedback'; say('Da ist noch ein weißes Feld ohne Farbe.'); return; }
   ptries++;
   const wrong=f.r.filter((reg,i)=>!accepts(reg.c,pcolors[i])).length;
   if(!wrong){
     plocked=true;
     log.push({q:f,tries:ptries}); markLearned(f.code);
     $('pfeedback').textContent = ptries===1 ? ['Wunderschön! 🎨','Perfekt gemalt! 🥳','Ein Kunstwerk! 🌟'][Math.random()*3|0] : 'Jetzt stimmt alles! 🎉';
+    say($('pfeedback').textContent+` Das ist die Flagge von ${von(f.code)}.`);
     $('pfeedback').className='feedback ok';
     $('pinfo').innerHTML=infoHTML(f.code,'ok');
     ['hintBtn','resetBtn','checkBtn'].forEach(id=>$(id).disabled=true);
@@ -694,7 +761,9 @@ $('checkBtn').onclick=()=>{
     $('pnextBtn').textContent=idx+1<deck.length?'Weiter ➜':'Fertig 🏁';
     $('pnextBtn').classList.add('show');
   } else {
-    $('pfeedback').textContent=`Fast! ${wrong} ${wrong===1?'Feld hat':'Felder haben'} noch eine andere Farbe. Probier es nochmal – oder schau dir mit 💡 das Original an.`;
+    $('pfeedback').textContent=`Fast! ${wrong===1?'Ein Feld hat':wrong+' Felder haben'} noch die falsche Farbe.`;
+    say(ptries>=2 ? 'Fast! Schau mal, so sieht die Flagge aus.' : 'Fast! Ein paar Farben stimmen noch nicht. Versuch es nochmal!');
+    if(ptries>=2) setTimeout(showOriginal,600);
     $('pfeedback').className='feedback bad';
     sad();
   }
@@ -703,7 +772,7 @@ $('pnextBtn').onclick=()=>{ idx++; if(idx<deck.length) paintAsk(); else { $('pba
 $('pstartBtn').onclick=()=>startPaint();
 
 // ================= Flaggen auf der Karte =================
-let mregion='all', mcount=10, MAP=null, mapPromise=null, showNames=true;
+let mregion='all', mcount=5, MAP=null, mapPromise=null, showNames=true;
 let M = {}; // aktuelle Karte
 let mtries=0, mlocked=false, msel=false;
 segment('mregionSeg', v=>{ mregion=v; });
@@ -862,7 +931,7 @@ async function startMap(override){
   catch(e){ $('mapbox').innerHTML='<div class="maploading">😕 Die Karte konnte nicht geladen werden. Bitte Internetverbindung prüfen und nochmal starten.</div>'; return; }
   buildMap();
   const minArea = mregion==='all' ? 6 : 20;
-  const cands = COUNTRIES.filter(c=>(mregion==='all'||c.region===mregion) && M.byId[c.code] && M.path.area(M.byId[c.code])>=minArea);
+  const cands = basePool().filter(c=>(mregion==='all'||c.region===mregion) && M.byId[c.code] && M.path.area(M.byId[c.code])>=minArea);
   const p=shuffle(cands);
   deck = Array.isArray(override) ? shuffle(override.filter(c=>M.byId[c.code])) : (mcount ? p.slice(0,Math.min(mcount,p.length)) : p);
   idx=0; log=[];
@@ -872,9 +941,10 @@ function mapAsk(){
   const q=deck[idx];
   mtries=0; mlocked=false; msel=false;
   $('mtoken').innerHTML=flagHTML(q.code); $('mtoken').className='token';
-  $('mtext').textContent=`Flagge ${idx+1} von ${deck.length}`;
+  $('mtext').textContent=`Flagge ${idx+1} von ${deck.length}`; $('mname').textContent=q.name;
+  say(`Wo liegt ${q.name}? Zieh die Flagge dorthin.`);
   $('mbar').style.width=(idx/deck.length*100)+'%';
-  $('mfeedback').textContent=`Tipp: Die Flagge gehört nach ${CONTNAME[CONT[q.code]]||RN[q.region]}.`; $('mfeedback').className='feedback';
+  $('mfeedback').textContent=`🌍 ${q.name} liegt in ${CONTNAME[CONT[q.code]]||RN[q.region]}.`; $('mfeedback').className='feedback';
   $('minfo').innerHTML='';
   $('mnextBtn').classList.remove('show'); $('mhintBtn').disabled=false;
   focusContinent(q.code);
@@ -892,6 +962,7 @@ function tryDrop(id){
     const c=M.path.centroid(largestPart(M.byId[id])); M.pins.push({code:id,x:c[0],y:c[1]}); drawOverlay();
     $('mtoken').classList.add('gone');
     $('mfeedback').textContent = mtries===1 ? praise() : 'Jetzt hast du es! 🎉';
+    say($('mfeedback').textContent+` Hier liegt ${q.name}.`);
     $('mfeedback').className='feedback ok';
     $('minfo').innerHTML=infoHTML(q.code,'ok');
     $('mhintBtn').disabled=true;
@@ -900,7 +971,9 @@ function tryDrop(id){
     $('mnextBtn').classList.add('show');
   } else {
     if(el){ el.classList.remove('wrongflash'); void el.getBoundingClientRect(); el.classList.add('wrongflash'); setTimeout(()=>el.classList.remove('wrongflash'),1000); }
-    $('mfeedback').textContent='Das ist es leider nicht – probier es nochmal!';
+    $('mfeedback').textContent=`Das ist ${nameOf(id)}. Versuch es nochmal!`;
+    say(`Das ist ${nameOf(id)}. ${mtries>=2?'Schau mal, wo es blinkt!':'Versuch es nochmal!'}`);
+    if(mtries>=2) setTimeout(()=>$('mhintBtn').click(),700);
     $('mfeedback').className='feedback bad';
     $('minfo').innerHTML = BYCODE[id] ? infoHTML(id,'miss',`Hier liegt <b>${nameOf(id)}</b> – seine Flagge sieht so aus:`)
                                       : `<div class="info miss"><div>Hier liegt <b>${nameOf(id)}</b>.</div></div>`;
@@ -918,9 +991,11 @@ $('mhintBtn').onclick=()=>{
   el.classList.remove('hintpulse'); void el.getBoundingClientRect(); el.classList.add('hintpulse');
   setTimeout(()=>el.classList.remove('hintpulse'),2900);
   $('mfeedback').textContent='💡 Schau mal, wo es blinkt!'; $('mfeedback').className='feedback';
+  if(mtries<2) say('Schau mal, wo es blinkt!');
 };
 $('mnextBtn').onclick=()=>{ idx++; if(idx<deck.length) mapAsk(); else { $('mbar').style.width='100%'; finish(); } };
 $('mstartBtn').onclick=()=>startMap();
+$('msay').onclick=()=>{ const q=deck[idx]; if(q) say(`Wo liegt ${q.name}?`); };
 
 // Ziehen (Maus + Touch) bzw. Antippen
 (()=>{
