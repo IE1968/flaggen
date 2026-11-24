@@ -131,8 +131,8 @@
   .dragclone .cf{width:84px;height:56px;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.35);background:#fff;display:flex;align-items:center;justify-content:center}
   .dragclone .cf svg{width:100%;height:100%}
   .dragclone .cf .emoji{font-size:56px}
-  .dragclone .tip{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #ff4f8b}
-  .dragclone .dot{width:8px;height:8px;border-radius:50%;background:#ff4f8b;box-shadow:0 0 0 2px #fff;margin-top:-1px}
+  .dragclone .tip{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:12px solid #ff4f8b;margin-top:-1px}
+  .dragclone .dot{width:10px;height:10px;border-radius:50%;background:#ff4f8b;box-shadow:0 0 0 2px #fff}
   .mfb{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;min-height:44px;margin:-4px 0 8px}
   .mfb .feedback{margin:0}
   .mfb .next{margin:0;padding:8px 22px}
@@ -151,6 +151,38 @@
   .maploading{padding:80px 20px;text-align:center;color:var(--muted)}
   .maptip{font-size:.85rem;color:var(--muted);text-align:center;margin-top:8px}
   @media (max-width:420px){ .flagbox{height:170px} .flag{height:150px} .answers button{font-size:.98rem;padding:14px 8px} header h1{font-size:1.3rem}}
+  /* Lernen */
+  .mini{width:48px;height:32px;border-radius:4px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:26px;background:#fff}
+  .mini svg{width:100%;height:100%;display:block}
+  .info{display:flex;align-items:center;gap:12px;border-radius:14px;padding:10px 14px;margin:12px auto 0;max-width:480px;text-align:left;font-size:1rem;line-height:1.35;animation:infoIn .35s ease}
+  .info.ok{background:#e9f8f0}
+  .info.miss{background:#fff3f0}
+  .info .det{color:var(--muted);font-size:.92rem}
+  @keyframes infoIn{from{opacity:0;transform:translateY(6px)}}
+  .review .det{color:var(--muted)}
+  .review .again{color:#c46a00;font-size:.85rem;font-weight:600;white-space:nowrap}
+  .endbtns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  #practiceBtn{margin-top:4px}
+  .stats .pill{font-weight:600}
+  /* Karte: Kontinente farbig, klare weiße Grenzen */
+  path.land{fill:#e3ddd0;stroke:#fff;stroke-width:1.1;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .15s,opacity .4s}
+  path.land.c-EU{fill:#f4c66e} path.land.c-AS{fill:#f2a398} path.land.c-AF{fill:#c3a9ef}
+  path.land.c-NA{fill:#9fd59a} path.land.c-SA{fill:#f0dc6c} path.land.c-OC{fill:#86cfca}
+  svg[data-focus] path.land{opacity:.3}
+  svg[data-focus="EU"] path.c-EU, svg[data-focus="AS"] path.c-AS, svg[data-focus="AF"] path.c-AF,
+  svg[data-focus="NA"] path.c-NA, svg[data-focus="SA"] path.c-SA, svg[data-focus="OC"] path.c-OC, svg[data-focus] path.land.done{opacity:1}
+  path.land.hover{fill:#fff36b !important}
+  path.land.done{fill:#2fae6a !important}
+  path.land.wrongflash{animation:wf 1s}
+  @keyframes wf{25%,75%{fill:#ff6b6b}}
+  path.land.hintpulse{animation:hp .7s 4}
+  @keyframes hp{50%{fill:#ffffff}}
+  .lbl{font-family:'Fredoka',system-ui,sans-serif;font-weight:600;fill:#1f2747;stroke:#fff;paint-order:stroke;stroke-linejoin:round;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .lbl.d{fill:#11683c}
+  .clbl{font-family:'Fredoka',system-ui,sans-serif;font-weight:700;fill:rgba(26,33,64,.32);letter-spacing:3px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .zoomctl button.on{background:var(--ink);color:#fff}
+  #minfo .info{margin:0 auto 10px}
+
 </style>
 </head>
 <body>
@@ -161,27 +193,27 @@
   <header>
     <h1>🏁 Flaggen<span>spiele</span></h1>
     <div class="stats">
-      <div class="pill">⭐ <b id="score">0</b></div>
-      <div class="pill">🔥 <b id="streak">0</b></div>
+      <div class="pill" title="So viele Flaggen hast du schon kennengelernt">📚 <b id="learned">0</b> kennengelernt</div>
     </div>
   </header>
 
   <!-- Menü -->
   <div class="card screen" id="menu">
-    <h2>Was möchtest du spielen?</h2>
-    <p>Such dir ein Spiel aus.</p>
+    <h2>Lass uns Flaggen entdecken!</h2>
+    <p>Such dir aus, wie du heute üben möchtest. Es gibt keine Punkte – nimm dir Zeit, probier aus und lerne nebenbei Länder und Hauptstädte kennen.</p>
     <div class="tiles">
       <button class="tile" id="tileGuess"><span class="ti">🔍</span><b>Flaggen erkennen</b><small>Welche Flagge gehört zu welchem Land?</small></button>
       <button class="tile" id="tilePaint"><span class="ti">🎨</span><b>Flaggen ausmalen</b><small>Male die Flagge in den richtigen Farben aus.</small></button>
       <button class="tile" id="tileMap"><span class="ti">🗺️</span><b>Flaggen auf der Karte</b><small>Ziehe die Flagge auf das richtige Land.</small></button>
     </div>
+    <div class="best" id="menuLearned"></div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
   <div class="card screen hidden" id="start">
     <button class="back" data-home>← Menü</button>
     <h2>🔍 Flaggen erkennen</h2>
-    <p>Wähle aus vier Ländern das richtige. Richtig = Lametta-Feuerwerk 🎆, falsch = 😢 und nochmal probieren. Punkte gibt's für Treffer im ersten Versuch.</p>
+    <p>Wähle aus vier Ländern das passende. Danach erfährst du die Hauptstadt und den Kontinent. Daneben getippt? Kein Problem – du siehst, wie die Flagge des gewählten Landes aussieht, und probierst einfach nochmal.</p>
     <div class="opts">
       <div>
         <label>Region</label>
@@ -195,7 +227,7 @@
         </div>
       </div>
       <div>
-        <label>Anzahl Fragen</label>
+        <label>Wie viele Flaggen?</label>
         <div class="seg" id="countSeg">
           <button data-v="10" class="on">10</button>
           <button data-v="20">20</button>
@@ -204,17 +236,16 @@
       </div>
     </div>
     <button class="big" id="startBtn">Los geht's!</button>
-    <div class="best" id="bestStart"></div>
   </div>
 
   <!-- Start: Flaggen ausmalen -->
   <div class="card screen hidden" id="pstart">
     <button class="back" data-home>← Menü</button>
     <h2>🎨 Flaggen ausmalen</h2>
-    <p>Du siehst den Ländernamen und eine leere Flagge. Wähle eine Farbe und tippe auf die Felder. Dann auf „Prüfen“. Richtig = Lametta-Feuerwerk 🎆, falsch = 😢 und nochmal probieren. Punkte gibt's, wenn beim ersten Prüfen alles stimmt – auch mit Tipp.</p>
+    <p>Du siehst den Ländernamen und eine leere Flagge. Wähle eine Farbe und tippe auf die Felder, dann auf „Prüfen“. Mit 💡 kannst du dir das Original jederzeit kurz anschauen.</p>
     <div class="opts">
       <div>
-        <label>Anzahl Flaggen</label>
+        <label>Wie viele Flaggen?</label>
         <div class="seg" id="pcountSeg">
           <button data-v="10" class="on">10</button>
           <button data-v="20">20</button>
@@ -223,14 +254,13 @@
       </div>
     </div>
     <button class="big" id="pstartBtn">Los geht's!</button>
-    <div class="best" id="pbestStart"></div>
   </div>
 
   <!-- Start: Karte -->
   <div class="card screen hidden" id="mstart">
     <button class="back" data-home>← Menü</button>
     <h2>🗺️ Flaggen auf der Karte</h2>
-    <p>Ziehe die Flagge mit dem Finger oder der Maus auf das richtige Land – oder tippe erst die Flagge und dann das Land an. Richtig = Lametta-Feuerwerk 🎆, falsch = 😢 und nochmal probieren. Mit zwei Fingern oder dem Mausrad kannst du die Karte vergrößern.</p>
+    <p>Ziehe die Flagge auf das richtige Land – oder tippe erst die Flagge und dann das Land an. Die Karte springt zum passenden Kontinent, die Kontinente haben eigene Farben und die Ländernamen helfen dir (mit „Aa“ ein- und ausschaltbar).</p>
     <div class="opts">
       <div>
         <label>Karte</label>
@@ -244,7 +274,7 @@
         </div>
       </div>
       <div>
-        <label>Anzahl Flaggen</label>
+        <label>Wie viele Flaggen?</label>
         <div class="seg" id="mcountSeg">
           <button data-v="10" class="on">10</button>
           <button data-v="20">20</button>
@@ -253,7 +283,6 @@
       </div>
     </div>
     <button class="big" id="mstartBtn">Los geht's!</button>
-    <div class="best" id="mbestStart"></div>
   </div>
 
   <!-- Spiel: Karte -->
@@ -266,8 +295,9 @@
       <button class="sbtn" id="mhintBtn">💡 Tipp</button>
     </div>
     <div class="mfb"><div class="feedback" id="mfeedback"></div><button class="next" id="mnextBtn">Weiter ➜</button></div>
+    <div id="minfo"></div>
     <div class="mapbox" id="mapbox"><div class="maploading">Karte wird geladen …</div></div>
-    <div class="maptip">Zoomen: zwei Finger, Mausrad oder + / −</div>
+    <div class="maptip">Zoomen: zwei Finger, Mausrad oder + / − · 🌍 ganze Welt · Aa Namen ein/aus</div>
   </div>
 
   <!-- Spiel: Ausmalen -->
@@ -279,11 +309,12 @@
     <div class="canvasbox"><div class="pflag" id="pflag"></div><div class="pflag hintflag" id="phint"></div></div>
     <div class="palette" id="palette"></div>
     <div class="pbtns">
-      <button class="sbtn" id="hintBtn">💡 Tipp</button>
+      <button class="sbtn" id="hintBtn">💡 Original zeigen</button>
       <button class="sbtn" id="resetBtn">↺ Leeren</button>
       <button class="sbtn primary" id="checkBtn">✔ Prüfen</button>
     </div>
     <div class="feedback" id="pfeedback"></div>
+    <div id="pinfo"></div>
     <button class="next" id="pnextBtn">Weiter ➜</button>
   </div>
 
@@ -292,62 +323,86 @@
     <button class="back" data-home>✕ Beenden</button>
     <div class="progress"><i id="bar"></i></div>
     <div class="flagbox"><div class="flag" id="flag"></div></div>
-    <div class="question" id="qtext">Frage 1 von 10 – zu welchem Land gehört diese Flagge?</div>
+    <div class="question" id="qtext">Zu welchem Land gehört diese Flagge?</div>
     <div class="answers" id="answers"></div>
     <div class="feedback" id="feedback"></div>
+    <div id="ginfo"></div>
     <button class="next" id="nextBtn">Weiter ➜</button>
   </div>
 
-  <!-- End -->
+  <!-- Abschluss -->
   <div class="card screen hidden" id="end">
-    <h2 id="endTitle">Geschafft!</h2>
-    <div class="result" id="endScore">0 / 10</div>
+    <h2 id="endTitle">Schön geübt!</h2>
     <p id="endMsg"></p>
     <div class="review" id="review"></div>
-    <button class="big" id="againBtn">Nochmal spielen</button>
-    <div><button class="back inline" data-home>← Zum Menü</button></div>
-    <div class="best" id="bestEnd"></div>
+    <button class="big" id="practiceBtn">🔁 Die kniffligen nochmal üben</button>
+    <div class="endbtns"><button class="sbtn" id="againBtn">Neue Runde</button><button class="sbtn" data-home>← Zum Menü</button></div>
   </div>
 </div>
 
 <script type="module">
-// ---------- Länderdaten ----------
+// ---------- Länderdaten: Code, Name, Region (Spielauswahl), Hauptstadt ----------
 const COUNTRIES = [
  // Europa
- ["DE","Deutschland","EU"],["AT","Österreich","EU"],["CH","Schweiz","EU"],["FR","Frankreich","EU"],["IT","Italien","EU"],
- ["ES","Spanien","EU"],["PT","Portugal","EU"],["NL","Niederlande","EU"],["BE","Belgien","EU"],["LU","Luxemburg","EU"],
- ["GB","Vereinigtes Königreich","EU"],["IE","Irland","EU"],["DK","Dänemark","EU"],["NO","Norwegen","EU"],["SE","Schweden","EU"],
- ["FI","Finnland","EU"],["IS","Island","EU"],["PL","Polen","EU"],["CZ","Tschechien","EU"],["SK","Slowakei","EU"],
- ["HU","Ungarn","EU"],["RO","Rumänien","EU"],["BG","Bulgarien","EU"],["GR","Griechenland","EU"],["HR","Kroatien","EU"],
- ["SI","Slowenien","EU"],["RS","Serbien","EU"],["BA","Bosnien und Herzegowina","EU"],["AL","Albanien","EU"],["MK","Nordmazedonien","EU"],
- ["ME","Montenegro","EU"],["UA","Ukraine","EU"],["BY","Belarus","EU"],["LT","Litauen","EU"],["LV","Lettland","EU"],
- ["EE","Estland","EU"],["MD","Moldau","EU"],["MT","Malta","EU"],["CY","Zypern","EU"],["RU","Russland","EU"],
- ["MC","Monaco","EU"],["LI","Liechtenstein","EU"],["AD","Andorra","EU"],["SM","San Marino","EU"],["VA","Vatikanstadt","EU"],
+ ["DE","Deutschland","EU","Berlin"],["AT","Österreich","EU","Wien"],["CH","Schweiz","EU","Bern"],["FR","Frankreich","EU","Paris"],
+ ["IT","Italien","EU","Rom"],["ES","Spanien","EU","Madrid"],["PT","Portugal","EU","Lissabon"],["NL","Niederlande","EU","Amsterdam"],
+ ["BE","Belgien","EU","Brüssel"],["LU","Luxemburg","EU","Luxemburg"],["GB","Vereinigtes Königreich","EU","London"],["IE","Irland","EU","Dublin"],
+ ["DK","Dänemark","EU","Kopenhagen"],["NO","Norwegen","EU","Oslo"],["SE","Schweden","EU","Stockholm"],["FI","Finnland","EU","Helsinki"],
+ ["IS","Island","EU","Reykjavík"],["PL","Polen","EU","Warschau"],["CZ","Tschechien","EU","Prag"],["SK","Slowakei","EU","Bratislava"],
+ ["HU","Ungarn","EU","Budapest"],["RO","Rumänien","EU","Bukarest"],["BG","Bulgarien","EU","Sofia"],["GR","Griechenland","EU","Athen"],
+ ["HR","Kroatien","EU","Zagreb"],["SI","Slowenien","EU","Ljubljana"],["RS","Serbien","EU","Belgrad"],["BA","Bosnien und Herzegowina","EU","Sarajevo"],
+ ["AL","Albanien","EU","Tirana"],["MK","Nordmazedonien","EU","Skopje"],["ME","Montenegro","EU","Podgorica"],["UA","Ukraine","EU","Kiew"],
+ ["BY","Belarus","EU","Minsk"],["LT","Litauen","EU","Vilnius"],["LV","Lettland","EU","Riga"],["EE","Estland","EU","Tallinn"],
+ ["MD","Moldau","EU","Chișinău"],["MT","Malta","EU","Valletta"],["CY","Zypern","EU","Nikosia"],["RU","Russland","EU","Moskau"],
+ ["MC","Monaco","EU","Monaco"],["LI","Liechtenstein","EU","Vaduz"],["AD","Andorra","EU","Andorra la Vella"],["SM","San Marino","EU","San Marino"],
+ ["VA","Vatikanstadt","EU","Vatikanstadt"],
  // Asien
- ["CN","China","AS"],["JP","Japan","AS"],["KR","Südkorea","AS"],["KP","Nordkorea","AS"],["IN","Indien","AS"],
- ["PK","Pakistan","AS"],["BD","Bangladesch","AS"],["ID","Indonesien","AS"],["TH","Thailand","AS"],["VN","Vietnam","AS"],
- ["PH","Philippinen","AS"],["MY","Malaysia","AS"],["SG","Singapur","AS"],["MN","Mongolei","AS"],["NP","Nepal","AS"],
- ["LK","Sri Lanka","AS"],["TR","Türkiye","AS"],["IL","Israel","AS"],["SA","Saudi-Arabien","AS"],["AE","Vereinigte Arabische Emirate","AS"],
- ["IR","Iran","AS"],["IQ","Irak","AS"],["JO","Jordanien","AS"],["LB","Libanon","AS"],["KZ","Kasachstan","AS"],
- ["GE","Georgien","AS"],["AM","Armenien","AS"],["AZ","Aserbaidschan","AS"],["QA","Katar","AS"],["BT","Bhutan","AS"],
- ["KH","Kambodscha","AS"],["LA","Laos","AS"],["MM","Myanmar","AS"],["AF","Afghanistan","AS"],["UZ","Usbekistan","AS"],
+ ["CN","China","AS","Peking"],["JP","Japan","AS","Tokio"],["KR","Südkorea","AS","Seoul"],["KP","Nordkorea","AS","Pjöngjang"],
+ ["IN","Indien","AS","Neu-Delhi"],["PK","Pakistan","AS","Islamabad"],["BD","Bangladesch","AS","Dhaka"],["ID","Indonesien","AS","Jakarta"],
+ ["TH","Thailand","AS","Bangkok"],["VN","Vietnam","AS","Hanoi"],["PH","Philippinen","AS","Manila"],["MY","Malaysia","AS","Kuala Lumpur"],
+ ["SG","Singapur","AS","Singapur"],["MN","Mongolei","AS","Ulaanbaatar"],["NP","Nepal","AS","Kathmandu"],["LK","Sri Lanka","AS","Sri Jayewardenepura Kotte"],
+ ["TR","Türkiye","AS","Ankara"],["IL","Israel","AS","Jerusalem (umstritten)"],["SA","Saudi-Arabien","AS","Riad"],["AE","Vereinigte Arabische Emirate","AS","Abu Dhabi"],
+ ["IR","Iran","AS","Teheran"],["IQ","Irak","AS","Bagdad"],["JO","Jordanien","AS","Amman"],["LB","Libanon","AS","Beirut"],
+ ["KZ","Kasachstan","AS","Astana"],["GE","Georgien","AS","Tiflis"],["AM","Armenien","AS","Jerewan"],["AZ","Aserbaidschan","AS","Baku"],
+ ["QA","Katar","AS","Doha"],["BT","Bhutan","AS","Thimphu"],["KH","Kambodscha","AS","Phnom Penh"],["LA","Laos","AS","Vientiane"],
+ ["MM","Myanmar","AS","Naypyidaw"],["AF","Afghanistan","AS","Kabul"],["UZ","Usbekistan","AS","Taschkent"],["YE","Jemen","AS","Sanaa"],
  // Afrika
- ["EG","Ägypten","AF"],["ZA","Südafrika","AF"],["NG","Nigeria","AF"],["KE","Kenia","AF"],["ET","Äthiopien","AF"],
- ["MA","Marokko","AF"],["DZ","Algerien","AF"],["TN","Tunesien","AF"],["GH","Ghana","AF"],["SN","Senegal","AF"],
- ["CM","Kamerun","AF"],["CI","Elfenbeinküste","AF"],["TZ","Tansania","AF"],["UG","Uganda","AF"],["RW","Ruanda","AF"],
- ["MG","Madagaskar","AF"],["AO","Angola","AF"],["MZ","Mosambik","AF"],["ZW","Simbabwe","AF"],["NA","Namibia","AF"],
- ["BW","Botswana","AF"],["ML","Mali","AF"],["LY","Libyen","AF"],["SD","Sudan","AF"],["CD","Demokratische Republik Kongo","AF"],
- ["SO","Somalia","AF"],["MU","Mauritius","AF"],["SC","Seychellen","AF"],
+ ["EG","Ägypten","AF","Kairo"],["ZA","Südafrika","AF","Pretoria"],["NG","Nigeria","AF","Abuja"],["KE","Kenia","AF","Nairobi"],
+ ["ET","Äthiopien","AF","Addis Abeba"],["MA","Marokko","AF","Rabat"],["DZ","Algerien","AF","Algier"],["TN","Tunesien","AF","Tunis"],
+ ["GH","Ghana","AF","Accra"],["SN","Senegal","AF","Dakar"],["CM","Kamerun","AF","Yaoundé"],["CI","Elfenbeinküste","AF","Yamoussoukro"],
+ ["TZ","Tansania","AF","Dodoma"],["UG","Uganda","AF","Kampala"],["RW","Ruanda","AF","Kigali"],["MG","Madagaskar","AF","Antananarivo"],
+ ["AO","Angola","AF","Luanda"],["MZ","Mosambik","AF","Maputo"],["ZW","Simbabwe","AF","Harare"],["NA","Namibia","AF","Windhoek"],
+ ["BW","Botswana","AF","Gaborone"],["ML","Mali","AF","Bamako"],["LY","Libyen","AF","Tripolis"],["SD","Sudan","AF","Khartum"],
+ ["CD","Demokratische Republik Kongo","AF","Kinshasa"],["SO","Somalia","AF","Mogadischu"],["MU","Mauritius","AF","Port Louis"],["SC","Seychellen","AF","Victoria"],
+ ["GA","Gabun","AF","Libreville"],["SL","Sierra Leone","AF","Freetown"],["GN","Guinea","AF","Conakry"],["BJ","Benin","AF","Porto-Novo"],
  // Amerika
- ["US","Vereinigte Staaten","AM"],["CA","Kanada","AM"],["MX","Mexiko","AM"],["BR","Brasilien","AM"],["AR","Argentinien","AM"],
- ["CL","Chile","AM"],["CO","Kolumbien","AM"],["PE","Peru","AM"],["VE","Venezuela","AM"],["EC","Ecuador","AM"],
- ["BO","Bolivien","AM"],["PY","Paraguay","AM"],["UY","Uruguay","AM"],["CU","Kuba","AM"],["JM","Jamaika","AM"],
- ["PA","Panama","AM"],["CR","Costa Rica","AM"],["GT","Guatemala","AM"],["HN","Honduras","AM"],["DO","Dominikanische Republik","AM"],
- ["HT","Haiti","AM"],["BS","Bahamas","AM"],["TT","Trinidad und Tobago","AM"],["NI","Nicaragua","AM"],["SV","El Salvador","AM"],
+ ["US","Vereinigte Staaten","AM","Washington, D.C."],["CA","Kanada","AM","Ottawa"],["MX","Mexiko","AM","Mexiko-Stadt"],["BR","Brasilien","AM","Brasília"],
+ ["AR","Argentinien","AM","Buenos Aires"],["CL","Chile","AM","Santiago de Chile"],["CO","Kolumbien","AM","Bogotá"],["PE","Peru","AM","Lima"],
+ ["VE","Venezuela","AM","Caracas"],["EC","Ecuador","AM","Quito"],["BO","Bolivien","AM","Sucre"],["PY","Paraguay","AM","Asunción"],
+ ["UY","Uruguay","AM","Montevideo"],["CU","Kuba","AM","Havanna"],["JM","Jamaika","AM","Kingston"],["PA","Panama","AM","Panama-Stadt"],
+ ["CR","Costa Rica","AM","San José"],["GT","Guatemala","AM","Guatemala-Stadt"],["HN","Honduras","AM","Tegucigalpa"],["DO","Dominikanische Republik","AM","Santo Domingo"],
+ ["HT","Haiti","AM","Port-au-Prince"],["BS","Bahamas","AM","Nassau"],["TT","Trinidad und Tobago","AM","Port of Spain"],["NI","Nicaragua","AM","Managua"],
+ ["SV","El Salvador","AM","San Salvador"],
  // Ozeanien
- ["AU","Australien","OC"],["NZ","Neuseeland","OC"],["FJ","Fidschi","OC"],["PG","Papua-Neuguinea","OC"],["WS","Samoa","OC"],
- ["TO","Tonga","OC"],["VU","Vanuatu","OC"],["SB","Salomonen","OC"],["PW","Palau","OC"],["KI","Kiribati","OC"]
-].map(([code,name,region])=>({code,name,region}));
+ ["AU","Australien","OC","Canberra"],["NZ","Neuseeland","OC","Wellington"],["FJ","Fidschi","OC","Suva"],["PG","Papua-Neuguinea","OC","Port Moresby"],
+ ["WS","Samoa","OC","Apia"],["TO","Tonga","OC","Nukuʻalofa"],["VU","Vanuatu","OC","Port Vila"],["SB","Salomonen","OC","Honiara"],
+ ["PW","Palau","OC","Ngerulmud"],["KI","Kiribati","OC","South Tarawa"]
+].map(([code,name,region,capital])=>({code,name,region,capital}));
+const BYCODE = Object.fromEntries(COUNTRIES.map(c=>[c.code,c]));
+
+// Kontinent jedes Kartenlandes (für Farben auf der Karte; Amerika geteilt in Nord und Süd)
+const CONT = {};
+Object.entries({
+ EU:'AD AL AT AX BA BE BG BY CH CY CZ DE DK EE ES FI FO FR GB GG GI GR HR HU IE IM IS IT JE LI LT LU LV MC MD ME MK MT NL NO PL PT RO RS RU SE SI SJ SK SM UA VA XK',
+ AS:'AE AF AM AZ BD BH BN BT CN GE HK ID IL IN IQ IR JO JP KG KH KP KR KW KZ LA LB LK MM MN MO MV MY NP OM PH PK PS QA SA SG SY TH TJ TL TM TR TW UZ VN YE',
+ AF:'AO BF BI BJ BW CD CF CG CI CM CV DJ DZ EG EH ER ET GA GH GM GN GQ GW KE KM LR LS LY MA MG ML MR MU MW MZ NA NE NG RE RW SC SD SH SL SN SO SS ST SZ TD TG TN TZ UG YT ZA ZM ZW',
+ NA:'AG AI AW BB BL BM BQ BS BZ CA CR CU CW DM DO GD GL GP GT HN HT JM KN KY LC MF MQ MS MX NI PA PM PR SV SX TC TT US VC VG VI',
+ SA:'AR BO BR CL CO EC FK GF GS GY PE PY SR UY VE',
+ OC:'AS AU CK FJ FM GU KI MH MP NC NF NR NU NZ PF PG PN PW SB TK TO TV UM VU WF WS'
+}).forEach(([k,v])=>v.split(' ').forEach(c=>CONT[c]=k));
+const CONTNAME = {EU:'Europa',AS:'Asien',AF:'Afrika',NA:'Nordamerika',SA:'Südamerika',OC:'Ozeanien'};
+const contOf = code => CONT[code] || (BYCODE[code] && BYCODE[code].region) || null;
+const RN = {all:'Welt',EU:'Europa',AS:'Asien',AF:'Afrika',AM:'Amerika',OC:'Ozeanien'};
 
 // ---------- Flaggen: SVGs aus country-flag-icons, sonst Emoji ----------
 let FLAGS = null;
@@ -363,135 +418,123 @@ function flagHTML(code){
   return `<span class="emoji">${emoji(code)}</span>`;
 }
 
-// ---------- Zustand ----------
+// ---------- Allgemeines ----------
 const $ = id => document.getElementById(id);
-let region='all', count=10, deck=[], idx=0, score=0, streak=0, bestStreak=0, log=[], locked=false;
 const store = {
   get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch{ return null; } },
   set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
 };
 const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
-
 function segment(id, cb){
   $(id).addEventListener('click', e=>{
     const b=e.target.closest('button'); if(!b) return;
     [...$(id).children].forEach(x=>x.classList.toggle('on', x===b)); cb(b.dataset.v);
   });
 }
-segment('regionSeg', v=>{ region=v; showBest(); });
-segment('countSeg', v=>{ count=+v; });
 
-let mode='guess';
+let mode='guess', deck=[], idx=0, log=[];
 const SCREENS=['menu','start','pstart','mstart','game','paint','mapgame','end'];
-function show(id){ SCREENS.forEach(s=>$(s).classList.toggle('hidden', s!==id)); document.querySelector('.wrap').classList.toggle('wide', id==='mapgame'); scrollTo({top:0}); }
-document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>show('menu'));
-$('tileGuess').onclick=()=>{ mode='guess'; showBest(); show('start'); };
-$('tilePaint').onclick=()=>{ mode='paint'; showBest(); show('pstart'); };
-$('tileMap').onclick=()=>{ mode='map'; showBest(); show('mstart'); loadMap().catch(()=>{}); };
-
-function bestKey(){ return mode==='paint' ? 'fahnenspiel-paint-best' : mode==='map' ? 'fahnenspiel-map-best-'+mregion : 'fahnenspiel-best-'+region; }
-function showBest(){
-  const b = store.get(bestKey());
-  const label = mode==='paint' ? 'Ausmalen' : mode==='map' ? 'Karte '+RN[mregion] : regionName();
-  const t = b ? `🏆 Bestleistung (${label}): ${b.pct}% · längste Serie ${b.streak}` : '';
-  $('bestStart').textContent = t; $('pbestStart').textContent = t; $('mbestStart').textContent = t; $('bestEnd').textContent = t;
+function show(id){
+  SCREENS.forEach(s=>$(s).classList.toggle('hidden', s!==id));
+  document.querySelector('.wrap').classList.toggle('wide', id==='mapgame');
+  scrollTo({top:0});
 }
-const RN={all:'Welt',EU:'Europa',AS:'Asien',AF:'Afrika',AM:'Amerika',OC:'Ozeanien'};
-const regionName = () => RN[region];
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{ show('menu'); updateLearned(); });
+$('tileGuess').onclick=()=>{ mode='guess'; show('start'); };
+$('tilePaint').onclick=()=>{ mode='paint'; show('pstart'); };
+$('tileMap').onclick=()=>{ mode='map'; show('mstart'); loadMap().catch(()=>{}); };
 
-function pool(){ return region==='all' ? COUNTRIES : COUNTRIES.filter(c=>c.region===region); }
-
-function startGame(){
-  const p = shuffle(pool());
-  deck = count ? p.slice(0, Math.min(count, p.length)) : p;
-  idx=0; score=0; streak=0; bestStreak=0; log=[];
-  $('score').textContent=0; $('streak').textContent=0;
-  show('game');
-  ask();
+// Lern-Sammlung: welche Flaggen kennst du schon? (nur für dich, ohne Wertung)
+let learned = new Set(store.get('flaggen-gelernt') || []);
+function markLearned(code){ if(!learned.has(code)){ learned.add(code); store.set('flaggen-gelernt',[...learned]); updateLearned(); } }
+function updateLearned(){
+  $('learned').textContent = learned.size;
+  const n=learned.size;
+  $('menuLearned').textContent = n ? `📚 Du hast schon ${n} ${n===1?'Flagge':'Flaggen'} kennengelernt.` : '';
 }
 
+// Info-Kärtchen zu einem Land
+function infoHTML(code, kind, lead){
+  const c=BYCODE[code]||{name:code};
+  const cont=contOf(code);
+  return `<div class="info ${kind||''}"><span class="mini">${flagHTML(code)}</span><div>${lead?lead:`<b>${c.name}</b>`}
+    ${c.capital?`<br><span class="det">🏛️ Hauptstadt: ${c.capital}</span>`:''}${cont?`<span class="det"> · 🌍 ${CONTNAME[cont]}</span>`:''}</div></div>`;
+}
+const PRAISE=['Super! 🎉','Richtig! 🥳','Klasse! ✨','Genau! 🎊','Toll! 🌟'];
+const praise=()=>PRAISE[Math.random()*PRAISE.length|0];
+
+// Abschluss – ohne Punkte, mit Lernrückblick
+function finish(){
+  show('end');
+  const n=log.length, again=log.filter(l=>l.tries>1);
+  $('endTitle').textContent = 'Schön geübt! 🌟';
+  $('endMsg').textContent = `Du hast ${n} ${n===1?'Flagge':'Flaggen'} angeschaut.` +
+    (again.length ? ` ${again.length===1?'Eine war':again.length+' waren'} etwas kniffliger – die kannst du gleich noch einmal üben.` : ' Alle hast du gleich beim ersten Mal gefunden!');
+  $('review').innerHTML = log.map(l=>{
+    const c=BYCODE[l.q.code]||{};
+    return `<div><span class="mini">${mode==='paint'?paintSVG(l.q,null,true):flagHTML(l.q.code)}</span>
+      <span><b>${l.q.name}</b>${c.capital?` <span class="det">· ${c.capital}</span>`:''}${l.tries>1?' <span class="again">🔁 nochmal üben</span>':''}</span></div>`;
+  }).join('');
+  $('practiceBtn').classList.toggle('hidden', !again.length);
+  $('practiceBtn').textContent = `🔁 Die kniffligen nochmal üben (${again.length})`;
+  $('practiceBtn').onclick = ()=>{ const d=again.map(l=>l.q); ({guess:startGame,paint:startPaint,map:startMap})[mode](d); };
+  fireworks(4);
+}
+$('againBtn').onclick=()=>show({paint:'pstart',map:'mstart'}[mode]||'start');
+
+// ================= Flaggen erkennen =================
+let region='all', count=10, locked=false, tries=0, firstPick=null;
+segment('regionSeg', v=>{ region=v; });
+segment('countSeg', v=>{ count=+v; });
+const pool = () => region==='all' ? COUNTRIES : COUNTRIES.filter(c=>c.region===region);
+
+function startGame(override){
+  const p=shuffle(pool());
+  deck = Array.isArray(override) ? shuffle(override) : (count ? p.slice(0,Math.min(count,p.length)) : p);
+  idx=0; log=[]; show('game'); ask();
+}
 function ask(){
   locked=false; tries=0; firstPick=null;
-  const q = deck[idx];
-  const p = pool();
-  // Ablenker bevorzugt aus derselben Region (macht's spannender)
-  const same = p.filter(c=>c.code!==q.code && c.region===q.region);
-  const others = shuffle(same.length>=3 ? same : p.filter(c=>c.code!==q.code)).slice(0,3);
-  const opts = shuffle([q, ...others]);
-  $('flag').innerHTML = flagHTML(q.code);
-  $('qtext').textContent = `Frage ${idx+1} von ${deck.length} – zu welchem Land gehört diese Flagge?`;
-  $('bar').style.width = (idx/deck.length*100)+'%';
-  $('feedback').textContent=''; $('feedback').className='feedback';
+  const q=deck[idx], p=COUNTRIES;
+  const same=p.filter(c=>c.code!==q.code && c.region===q.region);
+  const others=shuffle(same.length>=3?same:p.filter(c=>c.code!==q.code)).slice(0,3);
+  const opts=shuffle([q,...others]);
+  $('flag').innerHTML=flagHTML(q.code);
+  $('qtext').textContent=`Flagge ${idx+1} von ${deck.length} – zu welchem Land gehört sie?`;
+  $('bar').style.width=(idx/deck.length*100)+'%';
+  $('feedback').textContent=''; $('feedback').className='feedback'; $('ginfo').innerHTML='';
   $('nextBtn').classList.remove('show');
   const box=$('answers'); box.innerHTML='';
-  opts.forEach(o=>{
-    const b=document.createElement('button'); b.textContent=o.name; b.dataset.code=o.code;
-    b.onclick=()=>answer(b,o,q); box.appendChild(b);
-  });
+  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=o.name; b.dataset.code=o.code; b.onclick=()=>answer(b,o,q); box.appendChild(b); });
 }
-
-let tries=0, firstPick=null;
 function answer(btn,o,q){
   if(locked) return;
-  const ok = o.code===q.code;
-  tries++; if(!firstPick) firstPick=o;
-  if(ok){
-    locked=true;
-    [...$('answers').children].forEach(b=>b.disabled=true);
-    const firstTry = tries===1;
-    log.push({q,ok:firstTry,tries,picked:firstPick});
+  tries++;
+  if(o.code===q.code){
+    locked=true; [...$('answers').children].forEach(b=>b.disabled=true);
+    log.push({q,tries}); markLearned(q.code);
     btn.classList.add('correct');
-    if(firstTry){
-      score++; streak++; bestStreak=Math.max(bestStreak,streak);
-      const lobs = ['Super! 🎉','Richtig! 🥳','Klasse! ✨','Genau! 🎊','Perfekt! 🌟'];
-      $('feedback').textContent = lobs[Math.random()*lobs.length|0] + (streak>=3?`  ${streak}er-Serie!`:'');
-    } else {
-      $('feedback').textContent = `Jetzt stimmt's! 🎉 (im ${tries}. Versuch)`;
-    }
+    $('feedback').textContent = tries===1 ? praise() : 'Jetzt hast du es! 🎉';
     $('feedback').className='feedback ok';
-    fireworks(streak>=5 ? 6 : streak>=3 ? 4 : 3);
-    $('nextBtn').textContent = idx+1<deck.length ? 'Weiter ➜' : 'Ergebnis ansehen 🏁';
+    $('ginfo').innerHTML = infoHTML(q.code,'ok');
+    fireworks(3);
+    $('nextBtn').textContent = idx+1<deck.length ? 'Weiter ➜' : 'Fertig 🏁';
     $('nextBtn').classList.add('show');
   } else {
-    streak=0;
-    btn.classList.remove('wrong'); void btn.offsetWidth;
-    btn.classList.add('wrong'); btn.disabled=true;
-    $('feedback').textContent = 'Leider falsch – probier es nochmal!';
+    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong'); btn.disabled=true;
+    $('feedback').textContent='Das ist es leider nicht – probier es nochmal!';
     $('feedback').className='feedback bad';
+    $('ginfo').innerHTML = infoHTML(o.code,'miss',`So sieht die Flagge von <b>${o.name}</b> aus:`);
     sad();
   }
-  $('score').textContent=score; $('streak').textContent=streak;
 }
-
-$('nextBtn').onclick=()=>{ idx++; if(idx<deck.length) ask(); else finish(); };
-$('startBtn').onclick=startGame;
-$('againBtn').onclick=()=>{ showBest(); show({paint:'pstart',map:'mstart'}[mode]||'start'); };
+$('nextBtn').onclick=()=>{ idx++; if(idx<deck.length) ask(); else { $('bar').style.width='100%'; finish(); } };
+$('startBtn').onclick=()=>startGame();
 document.addEventListener('keydown',e=>{
   if($('game').classList.contains('hidden')) return;
   if(!locked && ['1','2','3','4'].includes(e.key)){ $('answers').children[+e.key-1]?.click(); }
   else if(locked && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); $('nextBtn').click(); }
 });
-
-function finish(){
-  $('bar').style.width='100%';
-  show('end');
-  const pct = Math.round(score/deck.length*100);
-  $('endScore').textContent = `${score} / ${deck.length}`;
-  const [t,m] = pct===100?['Flaggen-Profi! 🏆','Alles richtig – unglaublich!']:
-                pct>=80?['Stark! 🌟','Da kennt sich jemand aus.']:
-                pct>=50?['Gut gemacht! 👍','Mit etwas Übung wird das perfekt.']:
-                        ['Weiter üben! 💪','Jede Runde bringt neue Flaggen ins Gedächtnis.'];
-  $('endTitle').textContent=t; $('endMsg').textContent=`${m} Längste Serie: ${bestStreak}.`;
-  $('review').innerHTML = mode==='paint'
-   ? log.map(l=>`<div><span class="mini">${paintSVG(l.q,null,true)}</span>
-     <span>${l.ok?'✅':'❌'} <b>${l.q.name}</b>${l.hint?' 💡':''}${l.ok?'':` <span style="color:#9aa0b8">(${l.tries}. Versuch)</span>`}</span></div>`).join('')
-   : log.map(l=>`<div><span class="mini">${flagHTML(l.q.code)}</span>
-     <span>${l.ok?'✅':'❌'} <b>${l.q.name}</b>${l.hint?' 💡':''}${l.ok?'':` <span style="color:#9aa0b8">(${l.tries}. Versuch${l.picked?', zuerst: '+l.picked.name:''})</span>`}</span></div>`).join('');
-  const prev = store.get(bestKey());
-  if(!prev || pct>prev.pct || (pct===prev.pct && bestStreak>prev.streak)) store.set(bestKey(),{pct,streak:bestStreak});
-  showBest();
-  if(pct>=80) fireworks(8);
-}
 
 // ================= Flaggen ausmalen =================
 // Farbpalette: Schlüssel → [Name, Farbe]
@@ -586,7 +629,7 @@ function paintSVG(f, colors, solved){
   return `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${defs}${body}</svg>`;
 }
 
-let pcount=10, pcolors=[], pick='R', ptries=0, phint=false, plocked=false;
+let pcount=10, pcolors=[], pick='R', ptries=0, plocked=false;
 segment('pcountSeg', v=>{ pcount=+v; });
 
 // Palette aufbauen
@@ -597,22 +640,20 @@ $('palette').addEventListener('click',e=>{
   [...$('palette').children].forEach(x=>x.classList.toggle('on',x===b));
 });
 
-function startPaint(){
+function startPaint(override){
   const p=shuffle(PAINT);
-  deck = pcount ? p.slice(0,Math.min(pcount,p.length)) : p;
-  idx=0; score=0; streak=0; bestStreak=0; log=[];
-  $('score').textContent=0; $('streak').textContent=0;
-  show('paint'); paintAsk();
+  deck = Array.isArray(override) ? shuffle(override) : (pcount ? p.slice(0,Math.min(pcount,p.length)) : p);
+  idx=0; log=[]; show('paint'); paintAsk();
 }
 function paintAsk(){
   const f=deck[idx];
-  pcolors=f.r.map(()=>null); ptries=0; phint=false; plocked=false;
+  pcolors=f.r.map(()=>null); ptries=0; plocked=false;
   $('ptext').textContent=`Flagge ${idx+1} von ${deck.length} – male diese Flagge aus:`;
   $('pname').textContent=f.name;
   $('pbar').style.width=(idx/deck.length*100)+'%';
   $('pflag').classList.toggle('square',!!f.vb); $('phint').classList.toggle('square',!!f.vb);
   $('phint').innerHTML=paintSVG(f,null,true); $('phint').classList.remove('show');
-  $('pfeedback').textContent=''; $('pfeedback').className='feedback';
+  $('pfeedback').textContent=''; $('pfeedback').className='feedback'; $('pinfo').innerHTML='';
   $('pnextBtn').classList.remove('show');
   ['hintBtn','resetBtn','checkBtn'].forEach(id=>$(id).disabled=false);
   drawPaint();
@@ -627,10 +668,10 @@ $('pflag').addEventListener('click',e=>{
 $('resetBtn').onclick=()=>{ if(plocked) return; pcolors=pcolors.map(()=>null); drawPaint(); };
 let hintTimer;
 $('hintBtn').onclick=()=>{
-  if(plocked) return; phint=true;
+  if(plocked) return;
   $('phint').classList.add('show'); clearTimeout(hintTimer);
-  hintTimer=setTimeout(()=>$('phint').classList.remove('show'),1500);
-  $('pfeedback').textContent='💡 Gut hinschauen!'; $('pfeedback').className='feedback';
+  hintTimer=setTimeout(()=>$('phint').classList.remove('show'),2000);
+  $('pfeedback').textContent='💡 Schau genau hin – welche Farben siehst du wo?'; $('pfeedback').className='feedback';
 };
 $('checkBtn').onclick=()=>{
   if(plocked) return;
@@ -641,44 +682,65 @@ $('checkBtn').onclick=()=>{
   const wrong=f.r.filter((reg,i)=>!accepts(reg.c,pcolors[i])).length;
   if(!wrong){
     plocked=true;
-    const perfect = ptries===1;
-    log.push({q:f,ok:perfect,tries:ptries,hint:phint});
-    if(perfect){
-      score++; streak++; bestStreak=Math.max(bestStreak,streak);
-      const lobs=['Wunderschön! 🎨','Perfekt gemalt! 🥳','Klasse! ✨','Genau so! 🎊','Ein Kunstwerk! 🌟'];
-      $('pfeedback').textContent=lobs[Math.random()*lobs.length|0]+(streak>=3?`  ${streak}er-Serie!`:'');
-    } else {
-      $('pfeedback').textContent=`Jetzt stimmt's! 🎉 (im ${ptries}. Versuch)`;
-    }
+    log.push({q:f,tries:ptries}); markLearned(f.code);
+    $('pfeedback').textContent = ptries===1 ? ['Wunderschön! 🎨','Perfekt gemalt! 🥳','Ein Kunstwerk! 🌟'][Math.random()*3|0] : 'Jetzt stimmt alles! 🎉';
     $('pfeedback').className='feedback ok';
+    $('pinfo').innerHTML=infoHTML(f.code,'ok');
     ['hintBtn','resetBtn','checkBtn'].forEach(id=>$(id).disabled=true);
-    fireworks(streak>=5?6:streak>=3?4:3);
-    $('pnextBtn').textContent=idx+1<deck.length?'Weiter ➜':'Ergebnis ansehen 🏁';
+    fireworks(3);
+    $('pnextBtn').textContent=idx+1<deck.length?'Weiter ➜':'Fertig 🏁';
     $('pnextBtn').classList.add('show');
   } else {
-    streak=0;
-    $('pfeedback').textContent=`Leider falsch – ${wrong} ${wrong===1?'Feld stimmt':'Felder stimmen'} noch nicht. Probier es nochmal!`;
+    $('pfeedback').textContent=`Fast! ${wrong} ${wrong===1?'Feld hat':'Felder haben'} noch eine andere Farbe. Probier es nochmal – oder schau dir mit 💡 das Original an.`;
     $('pfeedback').className='feedback bad';
     sad();
   }
-  $('score').textContent=score; $('streak').textContent=streak;
 };
 $('pnextBtn').onclick=()=>{ idx++; if(idx<deck.length) paintAsk(); else { $('pbar').style.width='100%'; finish(); } };
-$('pstartBtn').onclick=startPaint;
+$('pstartBtn').onclick=()=>startPaint();
 
 // ================= Flaggen auf der Karte =================
-let mregion='all', mcount=10, MAP=null, mapPromise=null;
-let M = {}; // aktuelle Karte: proj, path, W, H, svg, root, zoom, t, pins, byId
-let mtries=0, mhint=false, mlocked=false, msel=false, mfirstWrong=null;
-segment('mregionSeg', v=>{ mregion=v; showBest(); });
+let mregion='all', mcount=10, MAP=null, mapPromise=null, showNames=true;
+let M = {}; // aktuelle Karte
+let mtries=0, mlocked=false, msel=false;
+segment('mregionSeg', v=>{ mregion=v; });
 segment('mcountSeg', v=>{ mcount=+v; });
 
-const BOXES={EU:[-25,34,45,71],AS:[25,-11,150,56],AF:[-20,-36,55,38],AM:[-170,-56,-30,72],OC:[110,-48,200,5]};
+// Ausschnitte (Längengrad/Breitengrad: West, Süd, Ost, Nord)
+const BOXES={EU:[-25,34,45,71],AS:[25,-11,150,56],AF:[-20,-36,55,38],AM:[-170,-56,-30,72],OC:[110,-48,200,5],
+             NA:[-170,6,-52,72],SA:[-92,-56,-33,13]};
+const WORLDBOX={EU:[-25,34,45,71],AS:[25,-11,150,56],AF:[-20,-36,55,38],NA:[-170,6,-52,72],SA:[-92,-56,-33,13],OC:[110,-48,180,2]};
+const CONTLABEL={EU:[15,55],AS:[92,47],AF:[20,6],NA:[-102,48],SA:[-60,-14],OC:[134,-24]};
+
 const featId = f => (f.id || (f.properties && (f.properties.id || f.properties.iso_a2)) || '').toUpperCase();
 function rewindGeom(g){
-  // d3 erwartet Außenringe im Uhrzeigersinn – falls verdreht, umkehren
   const fix = poly => { if(d3.geoArea({type:'Polygon',coordinates:poly}) > 2*Math.PI) poly.forEach(r=>r.reverse()); };
   if(g.type==='Polygon') fix(g.coordinates); else if(g.type==='MultiPolygon') g.coordinates.forEach(fix);
+}
+// Vereinfachen: Linien glätten (Douglas-Peucker) und kleine Inseln weglassen
+function rdp(pts, eps){
+  if(pts.length<5) return pts;
+  const keep=new Uint8Array(pts.length); keep[0]=keep[pts.length-1]=1;
+  const stack=[[0,pts.length-1]];
+  while(stack.length){
+    const [a,b]=stack.pop(); let md=0, mi=-1;
+    const [x1,y1]=pts[a],[x2,y2]=pts[b], dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy)||1e-9;
+    for(let i=a+1;i<b;i++){ const d=Math.abs(dy*pts[i][0]-dx*pts[i][1]+x2*y1-y2*x1)/L; if(d>md){md=d;mi=i;} }
+    if(md>eps && mi>0){ keep[mi]=1; stack.push([a,mi],[mi,b]); }
+  }
+  const out=pts.filter((_,i)=>keep[i]);
+  return out.length>=4 ? out : pts;
+}
+function simplifyFeature(f){
+  const g=f.geometry;
+  let polys = g.type==='Polygon' ? [g.coordinates] : g.type==='MultiPolygon' ? g.coordinates : [];
+  polys = polys.map(p=>p.map(r=>rdp(r,0.12)));
+  const areas = polys.map(p=>d3.geoArea({type:'Polygon',coordinates:p}));
+  const fixed = areas.map(a=>a>2*Math.PI ? 4*Math.PI-a : a);
+  const maxA = Math.max(...fixed);
+  polys = polys.filter((p,i)=>fixed[i]===maxA || fixed[i]>6e-5);   // Inseln < ca. 2500 km² weglassen
+  f.geometry = polys.length===1 ? {type:'Polygon',coordinates:polys[0]} : {type:'MultiPolygon',coordinates:polys};
+  rewindGeom(f.geometry);
 }
 function loadMap(){
   if(mapPromise) return mapPromise;
@@ -690,129 +752,172 @@ function loadMap(){
     let geo=null;
     for(const u of urls){ try{ const m=await import(u); geo=m.default||m; if(geo && geo.features) break; geo=null; }catch(e){} }
     if(!geo) throw new Error('Karte fehlt');
-    geo.features = geo.features.filter(f=>f.geometry && featId(f)!=='AQ');
-    geo.features.forEach(f=>rewindGeom(f.geometry));
+    geo = {type:'FeatureCollection', features: geo.features.filter(f=>f.geometry && featId(f)!=='AQ').map(f=>({type:'Feature',id:featId(f),properties:f.properties||{},geometry:JSON.parse(JSON.stringify(f.geometry))}))};
+    geo.features.forEach(f=>{ rewindGeom(f.geometry); simplifyFeature(f); });
+    // ganz winzige Inselstaaten, die keiner treffen kann, ausblenden
+    geo.features = geo.features.filter(f=>BYCODE[f.id] || d3.geoArea(f)>4e-5);
     MAP=geo; return geo;
   })();
   mapPromise.catch(()=>{ mapPromise=null; });
   return mapPromise;
 }
-const nameOf = id => (COUNTRIES.find(c=>c.code===id)||{}).name || (M.byId[id] && M.byId[id].properties && M.byId[id].properties.name) || id;
+const nameOf = id => (BYCODE[id]||{}).name || (M.byId[id] && M.byId[id].properties && M.byId[id].properties.name) || id;
 function largestPart(f){
   const g=f.geometry; if(g.type!=='MultiPolygon') return f;
   let best=null, ba=-1;
   g.coordinates.forEach(p=>{ const part={type:'Polygon',coordinates:p}; const a=M.path.area(part); if(a>ba){ba=a;best=part;} });
   return best;
 }
+const gridOf = ([x0,y0,x1,y1]) => { const pts=[]; for(let i=0;i<=6;i++) for(let j=0;j<=6;j++) pts.push([x0+(x1-x0)*i/6, y0+(y1-y0)*j/6]); return {type:'MultiPoint',coordinates:pts}; };
+
 function buildMap(){
   const W=1000; let proj, fitObj;
   if(mregion==='all'){ proj=d3.geoNaturalEarth1().rotate([-10,0]); fitObj={type:'Sphere'}; }
-  else{
-    const [x0,y0,x1,y1]=BOXES[mregion], pts=[];
-    for(let i=0;i<=6;i++) for(let j=0;j<=6;j++) pts.push([x0+(x1-x0)*i/6, y0+(y1-y0)*j/6]);
-    fitObj={type:'MultiPoint',coordinates:pts};
-    proj=d3.geoMercator(); if(mregion==='OC') proj.rotate([-155,0]);
-  }
+  else{ fitObj=gridOf(BOXES[mregion]); proj=d3.geoMercator(); if(mregion==='OC') proj.rotate([-155,0]); }
   proj.fitWidth(W, fitObj);
   const path=d3.geoPath(proj);
   const H=Math.ceil(path.bounds(fitObj)[1][1]);
-  M={proj,path,W,H,byId:{},pins:[],t:d3.zoomIdentity};
-  MAP.features.forEach(f=>M.byId[featId(f)]=f);
-  const paths=MAP.features.map(f=>{ const d=path(f); return d?`<path class="land" data-id="${featId(f)}" d="${d}"/>`:''; }).join('');
+  M={proj,path,W,H,byId:{},pins:[],t:d3.zoomIdentity,labels:[]};
+  MAP.features.forEach(f=>M.byId[f.id]=f);
+  const paths=MAP.features.map(f=>{ const d=path(f); const c=CONT[f.id]||''; return d?`<path class="land c-${c}" data-id="${f.id}" d="${d}"/>`:''; }).join('');
+  // Ländernamen: nur Länder aus unserer Liste, an der größten Teilfläche
+  MAP.features.forEach(f=>{
+    if(!BYCODE[f.id]) return;
+    const part=largestPart(f), b=path.bounds(part), c=path.centroid(part);
+    if(!isFinite(c[0])) return;
+    M.labels.push({id:f.id, name:BYCODE[f.id].name, x:c[0], y:c[1], w:b[1][0]-b[0][0], h:b[1][1]-b[0][1]});
+  });
+  M.contLabels = mregion==='all' ? Object.entries(CONTLABEL).map(([k,ll])=>{ const p=proj(ll); return {k,x:p[0],y:p[1]}; }) : [];
   $('mapbox').innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
     <rect width="${W}" height="${H}" fill="#cfe6f7"/>
-    ${mregion==='all'?`<path d="${path({type:'Sphere'})}" fill="#bcdcf3"/>`:''}
-    <g id="mroot">${paths}</g><g id="mpins"></g></svg>
-    <div class="zoomctl"><button id="zin" aria-label="Vergrößern">+</button><button id="zout" aria-label="Verkleinern">−</button><button id="zreset" aria-label="Ganze Karte">⟲</button></div>`;
+    ${mregion==='all'?`<path d="${path({type:'Sphere'})}" fill="#bfdff5"/>`:''}
+    <g id="mroot">${paths}</g><g id="mclbl"></g><g id="mlbl"></g><g id="mpins"></g></svg>
+    <div class="zoomctl"><button id="zin" aria-label="Vergrößern">+</button><button id="zout" aria-label="Verkleinern">−</button>
+      <button id="zreset" aria-label="Ganze Karte" title="Ganze Karte">🌍</button><button id="znames" class="${showNames?'on':''}" title="Ländernamen ein/aus" aria-label="Ländernamen ein/aus">Aa</button></div>`;
   M.svg=$('mapbox').querySelector('svg'); M.root=d3.select('#mroot');
-  M.zoom=d3.zoom().scaleExtent([1,14]).translateExtent([[0,0],[W,H]])
-    .on('zoom',e=>{ M.t=e.transform; M.root.attr('transform',e.transform); drawPins(); });
+  M.zoom=d3.zoom().scaleExtent([1,16]).translateExtent([[0,0],[W,H]])
+    .on('zoom',e=>{ M.t=e.transform; M.root.attr('transform',e.transform); drawOverlay(); });
   d3.select(M.svg).call(M.zoom).on('dblclick.zoom',null);
   $('zin').onclick=()=>d3.select(M.svg).transition().duration(300).call(M.zoom.scaleBy,1.7);
   $('zout').onclick=()=>d3.select(M.svg).transition().duration(300).call(M.zoom.scaleBy,1/1.7);
-  $('zreset').onclick=()=>d3.select(M.svg).transition().duration(400).call(M.zoom.transform,d3.zoomIdentity);
+  $('zreset').onclick=()=>d3.select(M.svg).transition().duration(500).call(M.zoom.transform,d3.zoomIdentity);
+  $('znames').onclick=()=>{ showNames=!showNames; $('znames').classList.toggle('on',showNames); drawOverlay(); };
   M.svg.addEventListener('click',e=>{
     const p=e.target.closest && e.target.closest('path.land');
     if(p && msel) tryDrop(p.dataset.id);
   });
+  new ResizeObserver(()=>drawOverlay()).observe(M.svg);
+  drawOverlay();
 }
 function svgFlagURL(code){
   const svg = FLAGS && (FLAGS[code] || (FLAGS.default && FLAGS.default[code]));
   return svg ? 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg) : null;
 }
-function drawPins(){
-  const k=Math.min(2.2, 1+ (M.t.k-1)*.15);
-  const w=30*k, h=20*k;
+// Namen, Kontinent-Beschriftung und Fähnchen – bleiben beim Zoomen gleich groß
+function drawOverlay(){
+  if(!M.svg) return;
+  const sf = M.W / (M.svg.clientWidth || M.W);   // Kartenpunkte pro Bildschirmpixel
+  const k=M.t.k, fs=11.5*sf;
+  const done=new Set(M.pins.map(p=>p.code));
+  $('mlbl').innerHTML = !showNames ? '' : M.labels.map(l=>{
+    const tw=l.name.length*fs*0.55;
+    if(!done.has(l.id) && (l.w*k < tw*0.85 || l.h*k < fs*1.1)) return '';
+    const x=M.t.applyX(l.x), y=M.t.applyY(l.y) + (done.has(l.id)?fs*1.5:0);
+    return `<text class="lbl${done.has(l.id)?' d':''}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${fs.toFixed(1)}" stroke-width="${(3*sf).toFixed(1)}">${l.name}</text>`;
+  }).join('');
+  $('mclbl').innerHTML = (k<1.8 ? M.contLabels : []).map(c=>
+    `<text class="clbl" x="${M.t.applyX(c.x).toFixed(1)}" y="${M.t.applyY(c.y).toFixed(1)}" font-size="${(20*sf).toFixed(1)}">${CONTNAME[c.k].toUpperCase()}</text>`).join('');
+  const w=30*sf, h=20*sf;
   $('mpins').innerHTML = M.pins.map(p=>{
     const x=M.t.applyX(p.x), y=M.t.applyY(p.y), url=svgFlagURL(p.code);
     return url
-      ? `<g transform="translate(${x-w/2},${y-h/2})" style="pointer-events:none"><rect x="-1.5" y="-1.5" width="${w+3}" height="${h+3}" rx="3" fill="#fff" opacity=".9"/><image href="${url}" width="${w}" height="${h}" preserveAspectRatio="none"/></g>`
-      : `<text x="${x}" y="${y}" font-size="${20*k}" text-anchor="middle" dominant-baseline="central" style="pointer-events:none">${emoji(p.code)}</text>`;
+      ? `<g transform="translate(${x-w/2},${y-h/2})" style="pointer-events:none"><rect x="${-1.5*sf}" y="${-1.5*sf}" width="${w+3*sf}" height="${h+3*sf}" rx="${3*sf}" fill="#fff"/><image href="${url}" width="${w}" height="${h}" preserveAspectRatio="none"/></g>`
+      : `<text x="${x}" y="${y}" font-size="${20*sf}" text-anchor="middle" dominant-baseline="central" style="pointer-events:none">${emoji(p.code)}</text>`;
   }).join('');
 }
+// Auf den Kontinent der Flagge zoomen und die anderen Kontinente blass machen (Hilfe)
+function focusContinent(code){
+  const c=CONT[code]; if(!c || !M.svg) return;
+  M.svg.setAttribute('data-focus',c);
+  const box = mregion==='all' ? WORLDBOX[c] : (mregion==='AM' ? BOXES[c] : null);
+  if(!box) return;
+  const [[x0,y0],[x1,y1]] = M.path.bounds(gridOf(box));
+  const k=Math.max(1,Math.min(8, .95/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
+  const t=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2);
+  d3.select(M.svg).transition().duration(900).call(M.zoom.transform,t);
+}
 
-async function startMap(){
+async function startMap(override){
   show('mapgame');
   $('mapbox').innerHTML='<div class="maploading">Karte wird geladen …</div>';
-  $('mtoken').innerHTML=''; $('mfeedback').textContent=''; $('mnextBtn').classList.remove('show');
+  $('mtoken').innerHTML=''; $('mfeedback').textContent=''; $('minfo').innerHTML=''; $('mnextBtn').classList.remove('show');
   try{ await loadMap(); }
   catch(e){ $('mapbox').innerHTML='<div class="maploading">😕 Die Karte konnte nicht geladen werden. Bitte Internetverbindung prüfen und nochmal starten.</div>'; return; }
   buildMap();
   const minArea = mregion==='all' ? 6 : 20;
   const cands = COUNTRIES.filter(c=>(mregion==='all'||c.region===mregion) && M.byId[c.code] && M.path.area(M.byId[c.code])>=minArea);
   const p=shuffle(cands);
-  deck = mcount ? p.slice(0,Math.min(mcount,p.length)) : p;
-  idx=0; score=0; streak=0; bestStreak=0; log=[];
-  $('score').textContent=0; $('streak').textContent=0;
+  deck = Array.isArray(override) ? shuffle(override.filter(c=>M.byId[c.code])) : (mcount ? p.slice(0,Math.min(mcount,p.length)) : p);
+  idx=0; log=[];
   mapAsk();
 }
 function mapAsk(){
   const q=deck[idx];
-  mtries=0; mhint=false; mlocked=false; msel=false; mfirstWrong=null;
+  mtries=0; mlocked=false; msel=false;
   $('mtoken').innerHTML=flagHTML(q.code); $('mtoken').className='token';
   $('mtext').textContent=`Flagge ${idx+1} von ${deck.length}`;
   $('mbar').style.width=(idx/deck.length*100)+'%';
-  $('mfeedback').textContent=''; $('mfeedback').className='feedback';
+  $('mfeedback').textContent=`Tipp: Die Flagge gehört nach ${CONTNAME[CONT[q.code]]||RN[q.region]}.`; $('mfeedback').className='feedback';
+  $('minfo').innerHTML='';
   $('mnextBtn').classList.remove('show'); $('mhintBtn').disabled=false;
+  focusContinent(q.code);
 }
 function tryDrop(id){
   if(mlocked || !id) return;
   const q=deck[idx];
   const el=M.svg.querySelector(`path.land[data-id="${id}"]`);
-  if(el && el.classList.contains('done')) { $('mfeedback').textContent=`${nameOf(id)} ist schon gelöst – such ein anderes Land.`; $('mfeedback').className='feedback'; return; }
+  if(el && el.classList.contains('done') && id!==q.code){ $('mfeedback').textContent=`${nameOf(id)} hast du schon gefunden – such ein anderes Land.`; $('mfeedback').className='feedback'; return; }
   mtries++; msel=false; $('mtoken').classList.remove('sel');
   if(id===q.code){
     mlocked=true;
-    const first = mtries===1;
-    log.push({q,ok:first,tries:mtries,hint:mhint,picked:mfirstWrong?{name:nameOf(mfirstWrong)}:null});
+    log.push({q,tries:mtries}); markLearned(q.code);
     el.classList.add('done');
-    const c=M.path.centroid(largestPart(M.byId[id])); M.pins.push({code:id,x:c[0],y:c[1]}); drawPins();
+    const c=M.path.centroid(largestPart(M.byId[id])); M.pins.push({code:id,x:c[0],y:c[1]}); drawOverlay();
     $('mtoken').classList.add('gone');
-    if(first){
-      score++; streak++; bestStreak=Math.max(bestStreak,streak);
-      const lobs=['Volltreffer! 🎯','Richtig! 🥳','Klasse! ✨','Genau! 🎊','Perfekt! 🌟'];
-      $('mfeedback').textContent=`${lobs[Math.random()*lobs.length|0]} Das ist ${q.name}.`+(streak>=3?`  ${streak}er-Serie!`:'');
-    } else {
-      $('mfeedback').textContent=`Jetzt stimmt's! 🎉 Das ist ${q.name} (im ${mtries}. Versuch).`;
-    }
+    $('mfeedback').textContent = mtries===1 ? praise() : 'Jetzt hast du es! 🎉';
     $('mfeedback').className='feedback ok';
+    $('minfo').innerHTML=infoHTML(q.code,'ok');
     $('mhintBtn').disabled=true;
-    fireworks(streak>=5?6:streak>=3?4:3);
-    $('mnextBtn').textContent=idx+1<deck.length?'Weiter ➜':'Ergebnis ansehen 🏁';
+    fireworks(3);
+    $('mnextBtn').textContent=idx+1<deck.length?'Weiter ➜':'Fertig 🏁';
     $('mnextBtn').classList.add('show');
   } else {
-    streak=0; if(!mfirstWrong) mfirstWrong=id;
     if(el){ el.classList.remove('wrongflash'); void el.getBoundingClientRect(); el.classList.add('wrongflash'); setTimeout(()=>el.classList.remove('wrongflash'),1000); }
-    $('mfeedback').textContent=`Das ist ${nameOf(id)} – leider falsch. Probier es nochmal!`;
+    $('mfeedback').textContent='Das ist es leider nicht – probier es nochmal!';
     $('mfeedback').className='feedback bad';
+    $('minfo').innerHTML = BYCODE[id] ? infoHTML(id,'miss',`Hier liegt <b>${nameOf(id)}</b> – seine Flagge sieht so aus:`)
+                                      : `<div class="info miss"><div>Hier liegt <b>${nameOf(id)}</b>.</div></div>`;
     sad();
   }
-  $('score').textContent=score; $('streak').textContent=streak;
 }
+
+$('mhintBtn').onclick=()=>{
+  if(mlocked || !M.svg) return;
+  const q=deck[idx], f=M.byId[q.code], el=M.svg.querySelector(`path.land[data-id="${q.code}"]`);
+  const [[x0,y0],[x1,y1]]=M.path.bounds(largestPart(f));
+  const k=Math.max(1,Math.min(6, .3/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
+  const t=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2);
+  d3.select(M.svg).transition().duration(700).call(M.zoom.transform,t);
+  el.classList.remove('hintpulse'); void el.getBoundingClientRect(); el.classList.add('hintpulse');
+  setTimeout(()=>el.classList.remove('hintpulse'),2900);
+  $('mfeedback').textContent='💡 Schau mal, wo es blinkt!'; $('mfeedback').className='feedback';
+};
+$('mnextBtn').onclick=()=>{ idx++; if(idx<deck.length) mapAsk(); else { $('mbar').style.width='100%'; finish(); } };
+$('mstartBtn').onclick=()=>startMap();
 
 // Ziehen (Maus + Touch) bzw. Antippen
 (()=>{
-  // Die Flagge schwebt über dem Finger; abgelegt wird an der Pfeilspitze darunter (gut sichtbar, nicht vom Finger verdeckt).
+  // Oben sitzt ein Punkt mit Pfeil, darunter hängt die Flagge, darunter ist der Finger. Abgelegt wird am Punkt.
   const tok=$('mtoken'); let start=null, clone=null, hover=null, lastLand=null, off=0, pid=null;
   const landAt=(x,y)=>{ const el=document.elementFromPoint(x,y); return el && el.closest ? el.closest('path.land') : null; };
   const setHover=p=>{ if(hover===p) return; if(hover) hover.classList.remove('hover'); hover=p; if(hover && !hover.classList.contains('done')) hover.classList.add('hover'); };
@@ -822,12 +927,12 @@ function tryDrop(id){
     e.preventDefault();
     if(!clone && Math.hypot(e.clientX-start.x,e.clientY-start.y)>6){
       clone=document.createElement('div'); clone.className='dragclone';
-      clone.innerHTML=`<div class="cf">${tok.innerHTML}</div><div class="tip"></div><div class="dot"></div>`;
+      clone.innerHTML=`<div class="dot"></div><div class="tip"></div><div class="cf">${tok.innerHTML}</div>`;
       document.body.appendChild(clone); tok.style.opacity=.35;
     }
     if(clone){
       const h=hit(e);
-      clone.style.transform=`translate(${h.x-42}px,${h.y-72}px)`;  // Punkt (dot) liegt genau auf h
+      clone.style.transform=`translate(${h.x-42}px,${h.y-5}px)`;  // Punkt (dot) oben liegt genau auf h, Flagge hängt darunter
       const p=landAt(h.x,h.y); setHover(p); if(p) lastLand=p; else if(!document.elementFromPoint(h.x,h.y)?.closest?.('#mapbox')) lastLand=null;
     }
   }
@@ -849,27 +954,12 @@ function tryDrop(id){
   tok.addEventListener('pointerdown',e=>{
     if(mlocked || !M.svg || start) return;
     e.preventDefault(); start={x:e.clientX,y:e.clientY}; pid=e.pointerId;
-    off = e.pointerType==='mouse' ? 0 : 40;   // bei Touch etwas über dem Finger
+    off = e.pointerType==='mouse' ? 0 : 85;   // bei Touch: Punkt oben, Flagge darunter, Finger ganz unten
     try{ tok.releasePointerCapture(e.pointerId); }catch{}
     addEventListener('pointermove',move,{passive:false}); addEventListener('pointerup',end); addEventListener('pointercancel',end);
   });
   tok.addEventListener('touchstart',e=>e.preventDefault(),{passive:false}); // iOS: kein Scrollen/Lupe beim Ziehen
 })();
-
-$('mhintBtn').onclick=()=>{
-  if(mlocked || !M.svg) return; mhint=true;
-  const q=deck[idx], f=M.byId[q.code], el=M.svg.querySelector(`path.land[data-id="${q.code}"]`);
-  const [[x0,y0],[x1,y1]]=M.path.bounds(largestPart(f));
-  const k=Math.max(1,Math.min(5, .3/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
-  const t=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2);
-  d3.select(M.svg).transition().duration(700).call(M.zoom.transform,t);
-  el.classList.remove('hintpulse'); void el.getBoundingClientRect(); el.classList.add('hintpulse');
-  setTimeout(()=>el.classList.remove('hintpulse'),2900);
-  $('mfeedback').textContent='💡 Schau mal, wo es blinkt!'; $('mfeedback').className='feedback';
-};
-$('mnextBtn').onclick=()=>{ idx++; if(idx<deck.length) mapAsk(); else { $('mbar').style.width='100%'; finish(); } };
-$('mstartBtn').onclick=startMap;
-
 // ---------- Trauriges Emoji ----------
 let sadTimer;
 function sad(){
@@ -945,8 +1035,7 @@ function tick(){
   if(rockets.length||parts.length) requestAnimationFrame(tick);
   else { running=false; ctx.clearRect(0,0,W,H); }
 }
-
-showBest();
+updateLearned();
 </script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
