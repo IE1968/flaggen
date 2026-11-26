@@ -257,7 +257,7 @@
       </div>
     </div>
     <div class="best" id="menuLearned"></div>
-    <div class="ver">Version 13</div>
+    <div class="ver">Version 14</div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
@@ -1185,8 +1185,29 @@ function themeAsk(){
   $('mnextBtn').classList.remove('show'); $('mhintBtn').disabled=false;
   M.svg.removeAttribute('data-focus'); M.ring=null; clearTimeout(M.ringTimer); drawOverlay();
   M.svg.querySelectorAll('path.hintpulse').forEach(e=>e.classList.remove('hintpulse'));
-  if(M.t.k>1.01) d3.select(M.svg).transition().duration(700).call(M.zoom.transform,d3.zoomIdentity);
+  themeFocus(q);
   say(theme.ask(q.s,q.pl)+' Zieh es auf die Karte.');
+}
+// Wie bei den Flaggen: erst die ganze Welt, dann in die richtige Gegend zoomen und den Kontinent hervorheben
+function themeFocus(item){
+  const t=item.t, sel=d3.select(M.svg);
+  const conts = t.c ? t.c : t.k ? [...new Set(t.k.map(c=>CONT[c]).filter(Boolean))] : [];
+  const focus = conts.length===1 ? conts[0] : null;
+  let tr = sel.transition('focus').duration(M.t.k>1.01 ? 700 : 0).call(M.zoom.transform,d3.zoomIdentity)
+              .transition().delay(900).duration(0).on('start',()=>{ if(focus) M.svg.setAttribute('data-focus',focus); });
+  // Gebiet, das zu sehen sein soll: Kontinent(e) oder Umgebung des Ziels
+  let center, k;
+  if(conts.length && !t.lat){
+    const pts=conts.flatMap(c=>gridOf(WORLDBOX[c]).coordinates);
+    const [[x0,y0],[x1,y1]] = M.path.bounds({type:'MultiPoint',coordinates:pts});
+    k=Math.max(1.2,Math.min(8, .8/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
+    center = t.c ? [(x0+x1)/2,(y0+y1)/2] : M.proj(themeHintPoint(item));
+  } else {
+    center = M.proj(themeHintPoint(item));
+    k = t.sea ? 1.7 : t.lat ? 1.5 : 2.2;
+  }
+  const tt=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-center[0],-center[1]);
+  tr.transition().delay(350).duration(1100).ease(d3.easeCubicInOut).call(M.zoom.transform,tt);
 }
 function themeDrop(x,y,pathEl){
   if(mlocked) return;
