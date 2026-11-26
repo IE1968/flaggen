@@ -1,4 +1,4 @@
-# Flaggenspiele
+# Weltreise
 
 Ein Browserspiel mit drei Spielen:
 

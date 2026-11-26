@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Flaggenspiele</title>
+<title>Weltreise</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1d2f6b">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Flaggen">
+<meta name="apple-mobile-web-app-title" content="Weltreise">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -180,6 +180,18 @@
   .answers.flags .nm{font-size:.95rem;visibility:hidden}
   .answers.flags button.named .nm{visibility:visible}
   @media (max-width:520px){ .answers.flags{gap:8px} .answers.flags button{padding:6px} .answers.flags .nm{font-size:.8rem} .ask b{font-size:1.5rem} }
+  .sect{margin:22px 0 10px;font-size:1.3rem;text-align:center}
+  .tiles.four{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .tiles.four .tile{padding:16px 8px}
+  .tiles.four .tile b{font-size:1rem;hyphens:auto;-webkit-hyphens:auto}
+  @media (max-width:820px){ .tiles.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:600px){ .tiles.four{grid-template-columns:1fr} }
+  .token .emo{font-size:70px;line-height:1;pointer-events:none}
+  .dragclone .cf .emo{font-size:42px;line-height:1}
+  .emo-big{font-size:46px;line-height:1;flex:none}
+  .emo-mini{font-size:24px;line-height:1}
+  circle.ring{fill:rgba(255,220,0,.25);stroke:#ff4f8b;pointer-events:none;animation:ringp 1s ease-in-out infinite}
+  @keyframes ringp{50%{opacity:.35}}
   .ver{text-align:center;color:#b3b8cc;font-size:.75rem;margin-top:14px}
   .endbtns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
   #practiceBtn{margin-top:4px}
@@ -211,7 +223,7 @@
 
 <div class="wrap">
   <header>
-    <h1>🏁 Flaggen<span>spiele</span></h1>
+    <h1>🌍 Welt<span>reise</span></h1>
     <div class="hright">
       <div class="stats"><div class="pill" title="So viele Flaggen hast du schon kennengelernt">📚 <b id="learned">0</b><span class="pl"> kennengelernt</span></div></div>
       <button class="sound" id="soundBtn" aria-label="Vorlesen an/aus">🔊</button>
@@ -221,11 +233,19 @@
 
   <!-- Menü -->
   <div class="card screen" id="menu">
-    <h2>Lass uns Flaggen entdecken! <button class="say" data-say="Lass uns Flaggen entdecken! Such dir ein Spiel aus.">🔊</button></h2>
+    <h2>Komm mit auf Weltreise! <button class="say" data-say="Komm mit auf Weltreise! Such dir ein Spiel aus.">🔊</button></h2>
+    <h3 class="sect" style="margin-top:4px">🏁 Flaggen</h3>
     <div class="tiles">
       <button class="tile" id="tileGuess"><span class="ti">🔍</span><b>Flagge finden</b><small>Welche Flagge ist es?</small></button>
       <button class="tile" id="tilePaint"><span class="ti">🎨</span><b>Flagge malen</b><small>Male die Flagge bunt an.</small></button>
       <button class="tile" id="tileMap"><span class="ti">🗺️</span><b>Flagge auf die Karte</b><small>Wo liegt das Land?</small></button>
+    </div>
+    <h3 class="sect">🌍 Welt entdecken <button class="say" data-say="Welt entdecken! Wo leben die Tiere? Was isst man wo? Wo stehen berühmte Bauwerke? Und wo sind Berge, Seen und Meere?">🔊</button></h3>
+    <div class="tiles four">
+      <button class="tile" data-theme="tiere"><span class="ti">🦁</span><b>Tiere der Welt</b><small>Wo leben sie?</small></button>
+      <button class="tile" data-theme="essen"><span class="ti">🍕</span><b>Gerichte der Welt</b><small>Was isst man wo?</small></button>
+      <button class="tile" data-theme="orte"><span class="ti">🗼</span><b>Sehenswürdig&shy;keiten</b><small>Berühmte Bauwerke</small></button>
+      <button class="tile" data-theme="natur"><span class="ti">🏔️</span><b>Berge, Seen & Meere</b><small>Wo ist was?</small></button>
     </div>
     <div class="opts levelbox">
       <div>
@@ -237,7 +257,7 @@
       </div>
     </div>
     <div class="best" id="menuLearned"></div>
-    <div class="ver">Version 11</div>
+    <div class="ver">Version 13</div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
@@ -276,10 +296,10 @@
 
   <!-- Start: Karte -->
   <div class="card screen hidden" id="mstart">
-    <h2>🗺️ Flaggen auf der Karte</h2>
-    <p class="kid">Zieh die Flagge mit dem Finger<br>auf das richtige Land! 👆🗺️</p>
+    <h2 id="mstartTitle">🗺️ Flagge auf die Karte</h2>
+    <p class="kid" id="mstartText">Zieh die Flagge mit dem Finger<br>auf das richtige Land! 👆🗺️</p>
     <div class="opts">
-      <div>
+      <div id="mregionBox">
         <label>Für Eltern: Welcher Teil der Welt?</label>
         <div class="seg" id="mregionSeg">
           <button data-v="all" class="on">🌍 Ganze Welt</button>
@@ -307,7 +327,7 @@
     <div class="progress"><i id="mbar"></i></div>
     <div class="tray">
       <div class="token" id="mtoken"></div>
-      <div class="traytext"><b id="mtext">Flagge 1 von 5</b><br>Wo liegt <b id="mname"></b>? <button class="say" id="msay" aria-label="Vorlesen">🔊</button></div>
+      <div class="traytext"><b id="mtext">Flagge 1 von 5</b><br><span id="mqline">Wo liegt <b id="mname"></b>?</span> <button class="say" id="msay" aria-label="Vorlesen">🔊</button></div>
       <button class="sbtn" id="mhintBtn">💡 Tipp</button>
     </div>
     <div class="mfb"><div class="feedback" id="mfeedback"></div><button class="next" id="mnextBtn">Weiter ➜</button></div>
@@ -464,7 +484,8 @@ function show(id){
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{ show('menu'); updateLearned(); });
 $('tileGuess').onclick=()=>{ mode='guess'; show('start'); };
 $('tilePaint').onclick=()=>{ mode='paint'; show('pstart'); };
-$('tileMap').onclick=()=>{ mode='map'; show('mstart'); loadMap().catch(()=>{}); };
+$('tileMap').onclick=()=>openFlagMap();
+document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>openTheme(b.dataset.theme));
 
 // ---------- Vorlesen (für Kinder, die noch nicht lesen) ----------
 let soundOn = store.get('flaggen-ton') !== false;
@@ -537,11 +558,11 @@ function finish(){
   show('end');
   const n=log.length, again=log.filter(l=>l.tries>1);
   $('endTitle').textContent = 'Schön geübt! 🌟';
-  $('endMsg').textContent = `Du hast ${n} ${n===1?'Flagge':'Flaggen'} geschafft!` + (again.length ? ' Willst du die schweren nochmal üben?' : ' Toll gemacht!');
-  say('Schön geübt! Du bist ein echter Flaggen-Profi! ' + $('endMsg').textContent);
+  $('endMsg').textContent = `Du hast ${n} ${theme&&mode==='map' ? (n===1?'Aufgabe':'Aufgaben') : (n===1?'Flagge':'Flaggen')} geschafft!` + (again.length ? ' Willst du die schweren nochmal üben?' : ' Toll gemacht!');
+  say('Schön geübt! Du bist ein echter ' + (theme&&mode==='map' ? 'Welt-Entdecker! ' : 'Flaggen-Profi! ') + $('endMsg').textContent);
   $('review').innerHTML = log.map(l=>{
     const c=BYCODE[l.q.code]||{};
-    return `<div><span class="mini">${mode==='paint'?paintSVG(l.q,null,true):flagHTML(l.q.code)}</span>
+    return `<div><span class="mini">${l.q.e ? `<span class="emo-mini">${l.q.e}</span>` : mode==='paint'?paintSVG(l.q,null,true):flagHTML(l.q.code)}</span>
       <span><b>${l.q.name}</b>${level!=='easy'&&c.capital?` <span class="det">· ${c.capital}</span>`:''}${l.tries>1?' <span class="again">🔁 nochmal üben</span>':''}</span></div>`;
   }).join('');
   $('practiceBtn').classList.toggle('hidden', !again.length);
@@ -865,6 +886,7 @@ const gridOf = ([x0,y0,x1,y1]) => { const pts=[]; for(let i=0;i<=6;i++) for(let 
 
 function buildMap(){
   const W=1000; let proj, fitObj;
+  if(theme) mregion='all';
   if(mregion==='all'){ proj=d3.geoNaturalEarth1().rotate([-10,0]); fitObj={type:'Sphere'}; }
   else{ fitObj=gridOf(BOXES[mregion]); proj=d3.geoMercator(); if(mregion==='OC') proj.rotate([-155,0]); }
   proj.fitWidth(W, fitObj);
@@ -897,7 +919,7 @@ function buildMap(){
   $('znames').onclick=()=>{ showNames=!showNames; $('znames').classList.toggle('on',showNames); drawOverlay(); };
   M.svg.addEventListener('click',e=>{
     const p=e.target.closest && e.target.closest('path.land');
-    if(p && msel) tryDrop(p.dataset.id);
+    if(msel){ if(theme) themeDrop(e.clientX,e.clientY,p); else if(p) tryDrop(p.dataset.id); }
   });
   new ResizeObserver(()=>drawOverlay()).observe(M.svg);
   drawOverlay();
@@ -921,8 +943,10 @@ function drawOverlay(){
   $('mclbl').innerHTML = (k<1.8 ? M.contLabels : []).map(c=>
     `<text class="clbl" x="${M.t.applyX(c.x).toFixed(1)}" y="${M.t.applyY(c.y).toFixed(1)}" font-size="${(20*sf).toFixed(1)}">${CONTNAME[c.k].toUpperCase()}</text>`).join('');
   const w=30*sf, h=20*sf;
-  $('mpins').innerHTML = M.pins.map(p=>{
-    const x=M.t.applyX(p.x), y=M.t.applyY(p.y), url=svgFlagURL(p.code);
+  $('mpins').innerHTML = (M.ring ? `<circle class="ring" cx="${M.t.applyX(M.ring.x)}" cy="${M.t.applyY(M.ring.y)}" r="${34*sf}" stroke-width="${5*sf}"/>` : '') + M.pins.map(p=>{
+    const x=M.t.applyX(p.x), y=M.t.applyY(p.y);
+    if(p.emo) return `<text x="${x}" y="${y}" font-size="${26*sf}" text-anchor="middle" dominant-baseline="central" style="pointer-events:none">${p.emo}</text>`;
+    const url=svgFlagURL(p.code);
     return url
       ? `<g transform="translate(${x-w/2},${y-h/2})" style="pointer-events:none"><rect x="${-1.5*sf}" y="${-1.5*sf}" width="${w+3*sf}" height="${h+3*sf}" rx="${3*sf}" fill="#fff"/><image href="${url}" width="${w}" height="${h}" preserveAspectRatio="none"/></g>`
       : `<text x="${x}" y="${y}" font-size="${20*sf}" text-anchor="middle" dominant-baseline="central" style="pointer-events:none">${emoji(p.code)}</text>`;
@@ -953,6 +977,11 @@ async function startMap(override){
   try{ await loadMap(); }
   catch(e){ $('mapbox').innerHTML='<div class="maploading">😕 Die Karte konnte nicht geladen werden. Bitte Internetverbindung prüfen und nochmal starten.</div>'; return; }
   buildMap();
+  if(theme){
+    const p=shuffle(theme.items);
+    deck = Array.isArray(override) ? shuffle(override) : (mcount ? p.slice(0,Math.min(mcount,p.length)) : p);
+    idx=0; log=[]; return mapAsk();
+  }
   const minArea = mregion==='all' ? 6 : 20;
   const cands = basePool().filter(c=>(mregion==='all'||c.region===mregion) && M.byId[c.code] && M.path.area(M.byId[c.code])>=minArea);
   const p=shuffle(cands);
@@ -961,10 +990,11 @@ async function startMap(override){
   mapAsk();
 }
 function mapAsk(){
+  if(theme) return themeAsk();
   const q=deck[idx];
   mtries=0; mlocked=false; msel=false;
   $('mtoken').innerHTML=flagHTML(q.code); $('mtoken').className='token';
-  $('mtext').textContent=`Flagge ${idx+1} von ${deck.length}`; $('mname').textContent=q.name;
+  $('mtext').textContent=`Flagge ${idx+1} von ${deck.length}`; $('mqline').innerHTML=`Wo liegt <b>${q.name}</b>?`;
   say(`Wo liegt ${q.name}? Zieh die Flagge dorthin.`);
   $('mbar').style.width=(idx/deck.length*100)+'%';
   $('mfeedback').textContent=`🌍 ${q.name} liegt in ${CONTNAME[CONT[q.code]]||RN[q.region]}.`; $('mfeedback').className='feedback';
@@ -1006,6 +1036,7 @@ function tryDrop(id){
 
 $('mhintBtn').onclick=()=>{
   if(mlocked || !M.svg) return;
+  if(theme) return themeHint();
   const q=deck[idx], f=M.byId[q.code], el=M.svg.querySelector(`path.land[data-id="${q.code}"]`);
   const [[x0,y0],[x1,y1]]=M.path.bounds(largestPart(f));
   const k=Math.max(1,Math.min(6, .3/Math.max((x1-x0)/M.W,(y1-y0)/M.H)));
@@ -1018,7 +1049,188 @@ $('mhintBtn').onclick=()=>{
 };
 $('mnextBtn').onclick=()=>{ idx++; if(idx<deck.length) mapAsk(); else { $('mbar').style.width='100%'; finish(); } };
 $('mstartBtn').onclick=()=>startMap();
-$('msay').onclick=()=>{ const q=deck[idx]; if(q) say(`Wo liegt ${q.name}?`); };
+$('msay').onclick=()=>{ const q=deck[idx]; if(q) say(theme ? theme.ask(q.s,q.pl) : `Wo liegt ${q.name}?`); };
+
+// ================= Welt entdecken: Tiere, Gerichte, Sehenswürdigkeiten, Natur =================
+// Ziel t: k = Länder, c = Kontinente, box = Gebiete [West,Süd,Ost,Nord], sea = nur im Meer, lat = nördlich von
+const THEMES = {
+  tiere:{ title:'🦁 Tiere der Welt', ask:(s,pl)=>`Wo ${pl?'leben':'lebt'} ${s}?`, intro:'Wo leben die Tiere?<br>Zieh das Tier auf die Karte! 🐾', unit:'Tier', items:[
+    ['🦘','Känguru','das Känguru',{k:['AU']},'Kängurus tragen ihre Babys in einem Beutel am Bauch.'],
+    ['🐨','Koala','der Koala',{k:['AU']},'Koalas schlafen fast den ganzen Tag in Eukalyptus-Bäumen.'],
+    ['🐼','Panda','der Panda',{k:['CN']},'Pandas leben in China und fressen am liebsten Bambus.'],
+    ['🐘','Elefant','der Elefant',{c:['AF','AS']},'Elefanten leben in Afrika und in Asien. Sie sind die größten Landtiere.'],
+    ['🦁','Löwe','der Löwe',{c:['AF']},'Löwen leben in Afrika in Gruppen. So eine Gruppe heißt Rudel.'],
+    ['🦒','Giraffe','die Giraffe',{c:['AF']},'Giraffen sind die größten Tiere der Welt. Mit ihrem langen Hals fressen sie Blätter von hohen Bäumen.'],
+    ['🦓','Zebra','das Zebra',{c:['AF']},'Jedes Zebra hat sein eigenes Streifenmuster.'],
+    ['🦛','Nilpferd','das Nilpferd',{c:['AF']},'Nilpferde liegen am Tag gern im Wasser, damit ihre Haut nicht austrocknet.'],
+    ['🐻‍❄️','Eisbär','der Eisbär',{lat:58,k:['GL','CA','RU','NO','US','IS']},'Eisbären leben ganz im Norden, wo es Eis und Schnee gibt.'],
+    ['🐪','Kamel','das Kamel',{k:['EG','MA','DZ','LY','TN','SD','ML','NE','TD','MR','SA','AE','OM','YE','JO','IQ','EH']},'Kamele können lange ohne Wasser durch die Wüste laufen.'],
+    ['🐅','Tiger','der Tiger',{c:['AS']},'Tiger leben in Asien. Sie sind die größten Katzen der Welt.'],
+    ['🦙','Lama','das Lama',{k:['PE','BO','CL','AR','EC']},'Lamas leben hoch oben in den Bergen von Südamerika.'],
+    ['🦜','Papagei','der Papagei',{c:['SA']},'Im Regenwald von Südamerika leben viele bunte Papageien.'],
+    ['🦅','Weißkopfseeadler','der Weißkopfseeadler',{k:['US','CA']},'Der Weißkopfseeadler ist das Wappentier der USA.'],
+    ['🦬','Bison','der Bison',{k:['US','CA']},'Bisons sind riesige Rinder mit dickem Fell. Sie leben in Nordamerika.'],
+    ['🦧','Orang-Utan','der Orang-Utan',{k:['ID','MY']},'Orang-Utans leben in den Regenwäldern von Indonesien und Malaysia.'],
+    ['🦔','Igel','der Igel',{c:['EU']},'Igel leben auch bei uns in Europa – vielleicht sogar in deinem Garten!']
+  ]},
+  essen:{ title:'🍕 Gerichte der Welt', ask:(s,pl)=>`Woher ${pl?'kommen':'kommt'} ${s}?`, intro:'Wo isst man was?<br>Zieh das Essen auf das richtige Land! 😋', unit:'Gericht', items:[
+    ['🍕','Pizza','die Pizza',{k:['IT']},'Die Pizza kommt aus Italien, aus der Stadt Neapel.'],
+    ['🍝','Spaghetti','die Spaghetti',{k:['IT']},'In Italien gibt es Hunderte verschiedene Nudelsorten.'],
+    ['🍣','Sushi','das Sushi',{k:['JP']},'Sushi ist Reis mit Fisch oder Gemüse. In Japan isst man es mit Stäbchen.'],
+    ['🥨','Brezel','die Brezel',{k:['DE']},'Brezeln gibt es in Deutschland bei jedem Bäcker.'],
+    ['🥐','Croissant','das Croissant',{k:['FR']},'In Frankreich isst man Croissants gern zum Frühstück.'],
+    ['🌮','Taco','der Taco',{k:['MX']},'Tacos sind gefüllte Maisfladen aus Mexiko.'],
+    ['🍔','Hamburger','der Hamburger',{k:['US']},'Hamburger sind in den USA besonders beliebt.'],
+    ['🥘','Paella','die Paella',{k:['ES']},'Paella ist ein Reisgericht aus Spanien, oft mit Fisch und Muscheln.'],
+    ['🥟','Teigtaschen','die Teigtaschen',{k:['CN']},'In China isst man Teigtaschen besonders gern zum Neujahrsfest.'],
+    ['🍛','Curry','das Curry',{k:['IN']},'Curry aus Indien hat viele Gewürze und ist oft schön scharf.'],
+    ['🧇','Waffel','die Waffel',{k:['BE']},'Belgische Waffeln kennt man auf der ganzen Welt.'],
+    ['🫕','Käsefondue','das Käsefondue',{k:['CH']},'Beim Käsefondue tunkt man Brot in geschmolzenen Käse.'],
+    ['🥙','Kebab','der Kebab',{k:['TR']},'Kebab ist gegrilltes Fleisch. Es ist ein bekanntes Essen aus der Türkiye.'],
+    ['🧀','Gouda-Käse','der Gouda-Käse',{k:['NL']},'Gouda ist eine Stadt in den Niederlanden und ein berühmter Käse.'],
+    ['🫒','Oliven','die Oliven',{k:['GR']},'In Griechenland wachsen sehr viele Olivenbäume.'],
+    ['🫖','Tee mit Milch','der Tee mit Milch',{k:['GB']},'In Großbritannien trinkt man gern Tee mit einem Schuss Milch.'],
+    ['🍜','Pho-Suppe','die Pho-Suppe',{k:['VN']},'Pho ist eine Nudelsuppe aus Vietnam.']
+  ]},
+  orte:{ title:'🗼 Sehenswürdigkeiten', ask:(s,pl)=>`Wo ${pl?'stehen':'steht'} ${s}?`, intro:'Berühmte Bauwerke!<br>Zieh sie auf das richtige Land! 🏰', unit:'Bauwerk', items:[
+    ['🗼','Eiffelturm','der Eiffelturm',{k:['FR']},'Der Eiffelturm steht in Paris und ist über 300 Meter hoch.'],
+    ['🗽','Freiheitsstatue','die Freiheitsstatue',{k:['US']},'Die Freiheitsstatue steht in New York und hält eine Fackel hoch.'],
+    ['🏰','Schloss Neuschwanstein','das Schloss Neuschwanstein',{k:['DE']},'Neuschwanstein in Bayern sieht aus wie ein Märchenschloss.'],
+    ['🏟️','Kolosseum','das Kolosseum',{k:['IT']},'Im Kolosseum in Rom kämpften vor langer Zeit Gladiatoren.'],
+    ['🏛️','Akropolis','die Akropolis',{k:['GR']},'Die Tempel der Akropolis in Athen sind fast 2500 Jahre alt.'],
+    ['🔺','Pyramiden','die Pyramiden',{k:['EG']},'Die Pyramiden in Ägypten sind über 4000 Jahre alt.'],
+    ['🧱','Chinesische Mauer','die Chinesische Mauer',{k:['CN']},'Die Chinesische Mauer ist viele tausend Kilometer lang.'],
+    ['🕌','Taj Mahal','das Taj Mahal',{k:['IN']},'Das Taj Mahal in Indien ist aus weißem Marmor gebaut.'],
+    ['🕰️','Big Ben','der Big Ben',{k:['GB']},'Big Ben ist die große Glocke im Uhrturm in London.'],
+    ['🎭','Opernhaus von Sydney','das Opernhaus von Sydney',{k:['AU']},'Das Dach des Opernhauses in Sydney sieht aus wie Segel.'],
+    ['⛪','Sagrada Família','die Sagrada Família',{k:['ES']},'An der Kirche Sagrada Família in Barcelona wird seit über 140 Jahren gebaut.'],
+    ['🌉','Golden Gate Bridge','die Golden Gate Bridge',{k:['US']},'Die Golden Gate Bridge in San Francisco ist eine riesige rote Brücke.'],
+    ['🗿','Steinköpfe der Osterinsel','die Steinköpfe der Osterinsel',{box:[[-125,-37,-95,-17]]},'Auf der Osterinsel im Pazifik stehen fast 1000 riesige Steinfiguren.']
+  ]},
+  natur:{ title:'🏔️ Berge, Seen & Meere', ask:(s,pl)=>`Wo ${pl?'sind':'ist'} ${s}?`, intro:'Berge, Seen und Meere!<br>Wo sind sie auf der Karte? 🌊', unit:'Ort', items:[
+    ['🏔️','Mount Everest','der Mount Everest',{k:['NP','CN']},'Der Mount Everest ist der höchste Berg der Welt.'],
+    ['🗻','Fuji','der Berg Fuji',{k:['JP']},'Der Fuji ist ein Vulkan und der höchste Berg Japans.'],
+    ['⛰️','Kilimandscharo','der Kilimandscharo',{k:['TZ']},'Der Kilimandscharo ist der höchste Berg Afrikas. Oben liegt sogar Schnee.'],
+    ['🏔️','Zugspitze','die Zugspitze',{k:['DE']},'Die Zugspitze ist der höchste Berg Deutschlands.'],
+    ['🏔️','Matterhorn','das Matterhorn',{k:['CH']},'Das Matterhorn in der Schweiz ist spitz wie ein Dreieck.'],
+    ['🌋','Ätna','der Ätna',{k:['IT']},'Der Ätna auf der Insel Sizilien ist ein Vulkan, der manchmal Feuer spuckt.'],
+    ['🏞️','Bodensee','der Bodensee',{k:['DE','CH','AT']},'Der Bodensee liegt zwischen Deutschland, Österreich und der Schweiz.'],
+    ['🐟','Nil','der Nil',{k:['EG','SD','SS','UG','ET']},'Der Nil in Afrika ist einer der längsten Flüsse der Welt.'],
+    ['🏜️','Wüste Sahara','die Wüste Sahara',{box:[[-17,15,35,33]]},'Die Sahara in Afrika ist die größte heiße Wüste der Welt.'],
+    ['🌳','Amazonas-Regenwald','der Amazonas-Regenwald',{box:[[-76,-16,-44,6]]},'Im Amazonas-Regenwald leben unglaublich viele Tiere und Pflanzen.'],
+    ['🧊','Grönland','Grönland',{k:['GL']},'Grönland ist die größte Insel der Welt und fast ganz mit Eis bedeckt.'],
+    ['🪸','Great Barrier Reef','das Great Barrier Reef',{box:[[140,-26,157,-9]]},'Vor Australien liegt das größte Korallenriff der Welt.'],
+    ['🌊','Pazifik','der Pazifik',{sea:true,box:[[115,-60,180,62],[-180,-60,-100,62],[-100,-60,-78,12]],h:[-150,5]},'Der Pazifik ist der größte Ozean der Welt.'],
+    ['🌊','Atlantik','der Atlantik',{sea:true,box:[[-65,-60,20,0],[-100,0,-5,66]],h:[-35,20]},'Der Atlantik liegt zwischen Amerika, Europa und Afrika.'],
+    ['🌊','Indischer Ozean','der Indische Ozean',{sea:true,box:[[30,-55,118,25]],h:[78,-15]},'Im warmen Indischen Ozean gibt es viele Korallenriffe.'],
+    ['🏖️','Mittelmeer','das Mittelmeer',{sea:true,box:[[-6,30,37,46]],h:[18,35]},'Am Mittelmeer machen viele Menschen Urlaub am Strand.'],
+    ['🦭','Nordsee','die Nordsee',{sea:true,box:[[-4,51,9.5,61.5]],h:[3,56]},'An der Nordsee gibt es Ebbe und Flut und das Wattenmeer.'],
+    ['⛵','Ostsee','die Ostsee',{sea:true,box:[[9.5,53,30.5,66]],h:[19,57]},'Die Ostsee liegt im Norden Deutschlands. Ebbe und Flut gibt es dort kaum.']
+  ]}
+};
+Object.entries(THEMES).forEach(([key,T])=>{
+  T.key=key;
+  const PL=new Set(['Spaghetti','Teigtaschen','Oliven','Pyramiden','Steinköpfe der Osterinsel']);
+  T.items=T.items.map(([e,name,s,t,f],i)=>({id:key+'-'+i, e, name, s, t, f, pl:PL.has(name)}));
+});
+let theme=null;
+
+function openTheme(key){
+  theme=THEMES[key]; mode='map';
+  $('mstartTitle').textContent=theme.title;
+  $('mstartText').innerHTML=theme.intro;
+  $('mregionBox').classList.add('hidden');
+  show('mstart'); loadMap().catch(()=>{});
+}
+function openFlagMap(){
+  theme=null; mode='map';
+  mregion=($('mregionSeg').querySelector('.on')||{dataset:{v:'all'}}).dataset.v;
+  $('mstartTitle').textContent='🗺️ Flagge auf die Karte';
+  $('mstartText').innerHTML='Zieh die Flagge mit dem Finger<br>auf das richtige Land! 👆🗺️';
+  $('mregionBox').classList.remove('hidden');
+  show('mstart'); loadMap().catch(()=>{});
+}
+const inBox=([lon,lat],[w,s,e,n])=> lat>=s && lat<=n && (w<=e ? lon>=w && lon<=e : lon>=w || lon<=e);
+// Bildschirm-Punkt → Längen-/Breitengrad
+function lonLatAt(x,y){
+  try{
+    const pt=M.svg.createSVGPoint(); pt.x=x; pt.y=y;
+    const p=pt.matrixTransform(M.svg.getScreenCTM().inverse());
+    const m=M.t.invert([p.x,p.y]);
+    return {map:m, ll:M.proj.invert(m)};
+  }catch{ return null; }
+}
+function themeHintPoint(item){
+  const t=item.t;
+  if(t.h) return t.h;
+  if(t.k){ const f=t.k.map(c=>M.byId[c]).find(Boolean); if(f) return M.proj.invert(M.path.centroid(largestPart(f))); }
+  if(t.box){ const [w,s,e,n]=t.box[0]; return [(w+e)/2,(s+n)/2]; }
+  if(t.c) return CONTLABEL[t.c[0]];
+  return [0,0];
+}
+function themeWhere(item){
+  const t=item.t;
+  const c = t.c ? t.c[0] : t.k ? CONT[t.k[0]] : null;
+  return c ? `Tipp: Schau mal in ${CONTNAME[c]}.` : '';
+}
+function themeAsk(){
+  const q=deck[idx];
+  mtries=0; mlocked=false; msel=false;
+  $('mtoken').innerHTML=`<span class="emo">${q.e}</span>`; $('mtoken').className='token';
+  $('mtext').textContent=`${theme.unit} ${idx+1} von ${deck.length}`;
+  $('mqline').innerHTML=theme.ask(`<b>${q.s}</b>`,q.pl);
+  $('mbar').style.width=(idx/deck.length*100)+'%';
+  $('mfeedback').textContent='Zieh das Bild an die richtige Stelle auf der Karte.'; $('mfeedback').className='feedback';
+  $('minfo').innerHTML='';
+  $('mnextBtn').classList.remove('show'); $('mhintBtn').disabled=false;
+  M.svg.removeAttribute('data-focus'); M.ring=null; clearTimeout(M.ringTimer); drawOverlay();
+  M.svg.querySelectorAll('path.hintpulse').forEach(e=>e.classList.remove('hintpulse'));
+  if(M.t.k>1.01) d3.select(M.svg).transition().duration(700).call(M.zoom.transform,d3.zoomIdentity);
+  say(theme.ask(q.s,q.pl)+' Zieh es auf die Karte.');
+}
+function themeDrop(x,y,pathEl){
+  if(mlocked) return;
+  const q=deck[idx], t=q.t, at=lonLatAt(x,y); if(!at || !at.ll || !isFinite(at.ll[0])) return;
+  const id=pathEl ? pathEl.dataset.id : null, ll=at.ll;
+  const ok = (t.k && id && t.k.includes(id)) || (t.c && id && t.c.includes(CONT[id])) ||
+             (t.box && t.box.some(b=>inBox(ll,b)) && (!t.sea || !id)) || (t.lat && ll[1]>=t.lat && (id || t.k));
+  mtries++; msel=false; $('mtoken').classList.remove('sel');
+  if(ok){
+    mlocked=true; M.ring=null;
+    log.push({q,tries:mtries}); markLearned(q.id);
+    M.pins.push({emo:q.e,x:at.map[0],y:at.map[1]}); drawOverlay();
+    $('mtoken').classList.add('gone');
+    const p = mtries===1 ? praise() : ['Jetzt hast du es! 🎉','Prima, gefunden! 🎉','Toll, geschafft! 🎉'][Math.random()*3|0];
+    $('mfeedback').textContent=p; $('mfeedback').className='feedback ok';
+    $('minfo').innerHTML=`<div class="info ok"><span class="emo-big">${q.e}</span><div><b>${q.name}</b><br><span class="det">${q.f}</span></div></div>`;
+    say(`${p} ${q.f}`);
+    $('mhintBtn').disabled=true;
+    fireworks(3);
+    $('mnextBtn').textContent=idx+1<deck.length?'Weiter ➜':'Fertig 🏁';
+    $('mnextBtn').classList.add('show');
+  } else {
+    if(pathEl){ pathEl.classList.remove('wrongflash'); void pathEl.getBoundingClientRect(); pathEl.classList.add('wrongflash'); setTimeout(()=>pathEl.classList.remove('wrongflash'),1000); }
+    const where = id ? (BYCODE[id] ? `Das ist ${nameOf(id)}.` : 'Hier ist es leider nicht.') : (t.sea ? 'Hier ist es leider nicht.' : 'Das ist das Meer.');
+    const tip = mtries===1 ? themeWhere(q) : '';
+    $('mfeedback').textContent=`${where} Versuch es nochmal! ${tip}`; $('mfeedback').className='feedback bad';
+    say(`${where} ${mtries>=2 ? 'Schau mal, wo es blinkt!' : 'Versuch es nochmal! '+tip}`);
+    if(mtries>=2) setTimeout(()=>$('mhintBtn').click(),700);
+    sad();
+  }
+}
+function themeHint(){
+  const q=deck[idx], t=q.t;
+  const [cx,cy]=M.proj(themeHintPoint(q));
+  const k = t.c || (t.k && t.k.length>2) ? 1.6 : t.box && t.sea ? 1.8 : 3.2;
+  const tr=d3.zoomIdentity.translate(M.W/2,M.H/2).scale(k).translate(-cx,-cy);
+  d3.select(M.svg).transition().duration(700).call(M.zoom.transform,tr);
+  const ids = t.k ? t.k : t.c ? MAP.features.filter(f=>t.c.includes(CONT[f.id])).map(f=>f.id) : [];
+  ids.forEach(id=>{ const el=M.svg.querySelector(`path.land[data-id="${id}"]`); if(el){ el.classList.remove('hintpulse'); void el.getBoundingClientRect(); el.classList.add('hintpulse'); setTimeout(()=>el.classList.remove('hintpulse'),2900); } });
+  clearTimeout(M.ringTimer);
+  if(!ids.length || t.box){ M.ring={x:cx,y:cy}; drawOverlay(); M.ringTimer=setTimeout(()=>{ M.ring=null; drawOverlay(); },4000); }
+  $('mfeedback').textContent='💡 Schau mal, wo es blinkt!'; $('mfeedback').className='feedback';
+  if(mtries<2) say('Schau mal, wo es blinkt!');
+}
 
 // Ziehen (Maus + Touch) bzw. Antippen
 (()=>{
@@ -1047,12 +1259,14 @@ $('msay').onclick=()=>{ const q=deck[idx]; if(q) say(`Wo liegt ${q.name}?`); };
     if(clone){
       const h=hit(e);
       clone.remove(); clone=null; tok.style.opacity='';
-      const p=landAt(h.x,h.y) || lastLand; setHover(null);
-      if(p) tryDrop(p.dataset.id);
+      const exact=landAt(h.x,h.y), p=exact || lastLand; setHover(null);
+      const onMap=document.elementFromPoint(h.x,h.y)?.closest?.('#mapbox svg');
+      if(theme){ if(onMap) themeDrop(h.x,h.y,exact); else { $('mfeedback').textContent='Lass das Bild über der Karte los – der rosa Punkt zeigt, wo es landet.'; $('mfeedback').className='feedback'; } }
+      else if(p) tryDrop(p.dataset.id);
       else { $('mfeedback').textContent='Lass die Flagge über einem Land los – der rosa Punkt zeigt, wo sie landet.'; $('mfeedback').className='feedback'; }
     } else if(e.type==='pointerup'){
       msel=!msel; tok.classList.toggle('sel',msel);
-      if(msel){ $('mfeedback').textContent='Jetzt das richtige Land auf der Karte antippen 👆'; $('mfeedback').className='feedback'; }
+      if(msel){ $('mfeedback').textContent='Jetzt auf die richtige Stelle der Karte tippen 👆'; $('mfeedback').className='feedback'; }
     }
     start=null; lastLand=null; pid=null;
   }

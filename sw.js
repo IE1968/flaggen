@@ -1,6 +1,6 @@
 // Service Worker: holt eigene Dateien immer frisch vom Server (an GitHubs Zwischenspeicher vorbei)
 // und merkt sich Bibliotheken/Kartendaten, damit das Spiel auch offline läuft.
-const CACHE = 'flaggenspiele-v6';
+const CACHE = 'weltreise-v7';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
