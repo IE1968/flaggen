@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Weltreise</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1d2f6b">
+<meta name="theme-color" content="#62bdf5">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Weltreise">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -215,9 +215,84 @@
   .zoomctl button.on{background:var(--ink);color:#fff}
   #minfo .info{margin:0 auto 10px}
 
+
+  /* ===================== Weltreise-Design ===================== */
+  :root{--ink:#1d2b5c; --muted:#5d6890; --sky1:#62bdf5; --sky2:#c9ecff; --sun:#ffc83d; --coral:#ff6b6b; --mint:#2fc49a; --grape:#8f7cff; --paper:#ffffff;}
+  html{background:linear-gradient(180deg,var(--sky1) 0%,#8fd2fa 45%,var(--sky2) 100%) fixed;min-height:100%}
+  body{background:transparent;color:var(--ink);font-family:'Fredoka',system-ui,sans-serif}
+  .sky{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .cloud{position:absolute;background:#fff;border-radius:999px;opacity:.85;filter:drop-shadow(0 6px 0 rgba(29,43,92,.06))}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .cloud::before{width:55%;height:150%;left:15%;bottom:20%}
+  .cloud::after{width:40%;height:120%;right:12%;bottom:25%}
+  .k1{width:180px;height:46px;top:16%;left:-30px}
+  .k2{width:240px;height:58px;top:58%;right:-60px;opacity:.7}
+  .k3{width:130px;height:34px;top:84%;left:8%;opacity:.75}
+  .k4{width:160px;height:40px;top:32%;right:6%;opacity:.6}
+  .plane{position:absolute;top:9%;left:-60px;font-size:34px;transform:rotate(8deg);animation:fly 38s linear infinite}
+  @keyframes fly{to{left:110%}}
+  @media (prefers-reduced-motion:reduce){ .plane{animation:none;left:auto;right:4%} }
+  .wrap{position:relative;z-index:1}
+  .wrap{max-width:760px}
+  header{background:transparent;color:var(--ink);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  header h1{color:var(--ink);font-size:1.75rem;letter-spacing:0;background:#fff;padding:6px 18px 6px 12px;border-radius:999px;box-shadow:0 4px 0 rgba(29,43,92,.12)}
+  header h1 span{color:#f39200}
+  .pill{background:#fff;border:2px solid #e3eaf7;color:var(--ink)}
+  .sound{background:#fff;box-shadow:0 3px 0 #d6def0}
+  .quit{background:var(--coral);color:#fff;box-shadow:0 5px 0 #d94848}
+  .quit:hover{background:#ff7b7b}
+  .quit:active{transform:translateY(3px);box-shadow:0 2px 0 #d94848}
+  .card{background:var(--paper);border-radius:30px;box-shadow:0 10px 0 rgba(29,43,92,.10),0 24px 50px rgba(29,43,92,.18)}
+  .screen h2{font-size:1.9rem;font-weight:700;color:var(--ink)}
+  .sect{font-weight:700;color:var(--ink)}
+  /* Spiel-Kacheln als Koffer-Aufkleber */
+  .tile{border:5px solid #fff;border-radius:26px;color:var(--ink);box-shadow:0 6px 0 rgba(29,43,92,.14),0 12px 22px rgba(29,43,92,.14);transition:transform .15s ease}
+  .tile .ti{display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.72);font-size:52px}
+  .tile b{font-size:1.15rem;font-weight:700}
+  .tile small{color:rgba(29,43,92,.78);font-weight:500}
+  .tile:nth-child(odd){transform:rotate(-1.5deg)} .tile:nth-child(even){transform:rotate(1.2deg)}
+  .tile:hover,.tile:focus-visible{transform:rotate(0) scale(1.04);border-color:#fff}
+  .tile:active{transform:scale(.97)}
+  .t1{background:#ff8f8f} .t2{background:#ffd35c} .t3{background:#5fd8b2}
+  .t4{background:#ffb05c} .t5{background:#ff8fc0} .t6{background:#b1a3ff} .t7{background:#7cc6ff}
+  .tiles.four .tile .ti{width:72px;height:72px;font-size:44px}
+  @media (max-width:600px){ .tile small{display:none} .tile b{font-size:1.2rem} .tile .ti{width:62px;height:62px;font-size:38px;flex:none} .tiles.four .tile .ti{width:62px;height:62px;font-size:38px} .tile:nth-child(n){transform:none} }
+  /* Knöpfe: dick und zum Draufdrücken */
+  .big{background:var(--sun);color:var(--ink);font-size:1.35rem;padding:16px 40px;box-shadow:0 6px 0 #e0a200;border:0}
+  .big:hover{filter:none;background:#ffd25e}
+  .big:active{transform:translateY(4px);box-shadow:0 2px 0 #e0a200}
+  .next{background:var(--mint);color:#fff;font-size:1.2rem;padding:13px 32px;box-shadow:0 5px 0 #219b78}
+  .next:active{transform:translateY(3px);box-shadow:0 2px 0 #219b78}
+  .sbtn{border:3px solid #e3eaf7;box-shadow:0 4px 0 #e3eaf7;font-size:1.05rem;padding:11px 20px}
+  .sbtn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #e3eaf7}
+  .sbtn.primary{background:var(--mint);border-color:var(--mint);box-shadow:0 4px 0 #219b78;color:#fff}
+  .say{background:#e9f5ff;box-shadow:0 3px 0 #cfe6fb}
+  .seg button{border:3px solid #e3eaf7;font-size:1rem;padding:10px 16px}
+  .seg button.on{background:var(--ink);border-color:var(--ink)}
+  :is(button,.tile):focus-visible{outline:4px solid var(--grape);outline-offset:3px}
+  /* Fortschritt: das Flugzeug fliegt die Route entlang */
+  .progress{height:14px;background:repeating-linear-gradient(90deg,#d6e4f5 0 12px,transparent 12px 20px);border-radius:0;overflow:visible;margin:4px 34px 22px 6px;position:relative}
+  .progress i.route{position:relative;height:100%;background:repeating-linear-gradient(90deg,var(--sun) 0 12px,transparent 12px 20px);overflow:visible;min-width:2px;transition:width .6s ease}
+  .progress i.route::after{content:"✈️";position:absolute;right:-26px;top:50%;transform:translateY(-52%);font-size:28px}
+  .progress::after{content:"🏁";position:absolute;right:-34px;top:50%;transform:translateY(-55%);font-size:22px}
+  /* Spielflächen */
+  .ask b,.pname{color:var(--ink)}
+  .answers.flags button{background:#f4f8ff;border:4px solid #fff;border-radius:22px;box-shadow:0 5px 0 #dbe5f5}
+  .answers.flags button:hover:not(:disabled){background:#eaf3ff}
+  .answers.flags button.correct{background:#ddf7ec;border-color:var(--mint)}
+  .answers.flags button.wrong{background:#ffecec;border-color:var(--coral)}
+  .token{border:4px solid #fff;border-radius:16px;box-shadow:0 6px 0 rgba(29,43,92,.12),0 10px 20px rgba(29,43,92,.18);background:#f4f8ff}
+  .mapbox{border:5px solid #fff;border-radius:24px;box-shadow:0 6px 0 rgba(29,43,92,.1)}
+  .zoomctl button{border-radius:14px;box-shadow:0 3px 0 #d6def0}
+  .sw{width:52px;height:52px;border-width:4px}
+  .info{border-radius:20px;border:3px solid #fff;box-shadow:0 4px 0 rgba(29,43,92,.07)}
+  .info.ok{background:#e3f9ef} .info.miss{background:#fff0ea}
+  .feedback.ok{color:#14936b} .feedback.bad{color:#d94848}
+  .ver{color:#9aa6c4}
 </style>
 </head>
 <body>
+<div class="sky" aria-hidden="true"><span class="cloud k1"></span><span class="cloud k2"></span><span class="cloud k3"></span><span class="cloud k4"></span><span class="plane">✈️</span></div>
 <canvas id="fx"></canvas>
 <div class="sad" id="sad"><span>😮</span></div>
 
@@ -236,16 +311,16 @@
     <h2>Komm mit auf Weltreise! <button class="say" data-say="Komm mit auf Weltreise! Such dir ein Spiel aus.">🔊</button></h2>
     <h3 class="sect" style="margin-top:4px">🏁 Flaggen</h3>
     <div class="tiles">
-      <button class="tile" id="tileGuess"><span class="ti">🔍</span><b>Flagge finden</b><small>Welche Flagge ist es?</small></button>
-      <button class="tile" id="tilePaint"><span class="ti">🎨</span><b>Flagge malen</b><small>Male die Flagge bunt an.</small></button>
-      <button class="tile" id="tileMap"><span class="ti">🗺️</span><b>Flagge auf die Karte</b><small>Wo liegt das Land?</small></button>
+      <button class="tile t1" id="tileGuess"><span class="ti">🔍</span><b>Flagge finden</b><small>Welche Flagge ist es?</small></button>
+      <button class="tile t2" id="tilePaint"><span class="ti">🎨</span><b>Flagge malen</b><small>Male die Flagge bunt an.</small></button>
+      <button class="tile t3" id="tileMap"><span class="ti">🗺️</span><b>Flagge auf die Karte</b><small>Wo liegt das Land?</small></button>
     </div>
     <h3 class="sect">🌍 Welt entdecken <button class="say" data-say="Welt entdecken! Wo leben die Tiere? Was isst man wo? Wo stehen berühmte Bauwerke? Und wo sind Berge, Seen und Meere?">🔊</button></h3>
     <div class="tiles four">
-      <button class="tile" data-theme="tiere"><span class="ti">🦁</span><b>Tiere der Welt</b><small>Wo leben sie?</small></button>
-      <button class="tile" data-theme="essen"><span class="ti">🍕</span><b>Gerichte der Welt</b><small>Was isst man wo?</small></button>
-      <button class="tile" data-theme="orte"><span class="ti">🗼</span><b>Sehenswürdig&shy;keiten</b><small>Berühmte Bauwerke</small></button>
-      <button class="tile" data-theme="natur"><span class="ti">🏔️</span><b>Berge, Seen & Meere</b><small>Wo ist was?</small></button>
+      <button class="tile t4" data-theme="tiere"><span class="ti">🦁</span><b>Tiere der Welt</b><small>Wo leben sie?</small></button>
+      <button class="tile t5" data-theme="essen"><span class="ti">🍕</span><b>Gerichte der Welt</b><small>Was isst man wo?</small></button>
+      <button class="tile t6" data-theme="orte"><span class="ti">🗼</span><b>Sehenswürdig&shy;keiten</b><small>Berühmte Bauwerke</small></button>
+      <button class="tile t7" data-theme="natur"><span class="ti">🏔️</span><b>Berge, Seen & Meere</b><small>Wo ist was?</small></button>
     </div>
     <div class="opts levelbox">
       <div>
@@ -257,7 +332,7 @@
       </div>
     </div>
     <div class="best" id="menuLearned"></div>
-    <div class="ver">Version 14</div>
+    <div class="ver">Version 15</div>
   </div>
 
   <!-- Start: Flaggen erkennen -->
@@ -324,7 +399,7 @@
 
   <!-- Spiel: Karte -->
   <div class="card hidden" id="mapgame">
-    <div class="progress"><i id="mbar"></i></div>
+    <div class="progress"><i class="route" id="mbar"></i></div>
     <div class="tray">
       <div class="token" id="mtoken"></div>
       <div class="traytext"><b id="mtext">Flagge 1 von 5</b><br><span id="mqline">Wo liegt <b id="mname"></b>?</span> <button class="say" id="msay" aria-label="Vorlesen">🔊</button></div>
@@ -338,7 +413,7 @@
 
   <!-- Spiel: Ausmalen -->
   <div class="card hidden" id="paint">
-    <div class="progress"><i id="pbar"></i></div>
+    <div class="progress"><i class="route" id="pbar"></i></div>
     <div class="question" id="ptext">Male die Flagge aus</div>
     <div class="pname" id="pname"></div>
     <div class="canvasbox"><div class="pflag" id="pflag"></div><div class="pflag hintflag" id="phint"></div></div>
@@ -355,7 +430,7 @@
 
   <!-- Spiel: Erkennen -->
   <div class="card hidden" id="game">
-    <div class="progress"><i id="bar"></i></div>
+    <div class="progress"><i class="route" id="bar"></i></div>
     <div class="question" id="qtext">Flagge 1 von 5</div>
     <div class="ask"><span>Wo ist die Flagge von</span> <b id="qname"></b> <button class="say" id="qsay" aria-label="Vorlesen">🔊</button></div>
     <div class="answers flags" id="answers"></div>
